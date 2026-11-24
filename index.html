@@ -87,12 +87,18 @@ html.hc #sub{ background:#000; border-color:var(--acc); }
 /* 모바일 가로 화면: 무대와 이미지 폭을 최대로 확보하고 자막을 하단 고정 패널로 분리 */
 @media (max-width: 900px), (max-height: 600px){
   html.rot #app{ position:relative; display:block; width:var(--W); height:var(--H); }
-  html.rot #menu{ display:none; }
-  html.rot #stage{ position:absolute; inset:0; padding:0 0 29%; width:100%; height:100%; }
+  /* 모바일에서도 왼쪽 장 선택 메뉴를 항상 표시 */
+  html.rot #menu{ position:absolute; z-index:12; left:0; top:0; bottom:0; width:clamp(112px,20%,190px); display:flex; flex-direction:column; overflow-x:hidden; overflow-y:auto; padding:8px 7px calc(8px + env(safe-area-inset-bottom,0px)) max(7px, env(safe-area-inset-left,0px)); border-right:2px solid var(--acc); background:rgba(26,23,18,.98); }
+  html.rot #menu .lv{ min-height:46px; padding:4px 6px; gap:6px; }
+  html.rot #menu .lv b{ width:1.6rem; height:1.6rem; font-size:.85rem; }
+  html.rot #menu .lv span{ font-size:clamp(.78rem,1.8vw,1rem); }
+  html.rot #menu .row{ gap:4px; padding-top:5px; }
+  html.rot #menu .ib{ min-width:38px; height:40px; padding:0 7px; font-size:.78rem; }
+  html.rot #stage{ position:absolute; left:clamp(112px,20%,190px); right:0; top:0; bottom:0; padding:0 0 29%; width:auto; height:100%; }
   html.rot .view{ inset:0 0 29%; }
   html.rot .view video{ width:100%; height:100%; object-fit:contain; }
   html.rot #sub{ display:none; }
-  html.rot #side{ position:absolute; z-index:10; left:0; right:0; bottom:0; height:29%; min-height:0; display:flex; border:0; border-top:2px solid var(--acc); padding:0  max(12px, env(safe-area-inset-left,0px)) env(safe-area-inset-bottom,0px); background:rgba(15,13,10,.97); }
+  html.rot #side{ position:absolute; z-index:10; left:clamp(112px,20%,190px); right:0; bottom:0; height:29%; min-height:0; display:flex; border:0; border-top:2px solid var(--acc); padding:0 max(12px, env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) 12px; background:rgba(15,13,10,.97); }
   html.rot #chips{ display:none; }
   html.rot #cap{ flex:1; min-height:0; overflow:hidden; padding:6px 12px 8px; }
   html.rot #capWho{ display:block; font-size:.82rem; line-height:1.2; }
@@ -153,6 +159,29 @@ html.rot .dlg{ position:absolute; }
 #ovWrap video{ width:100%; height:100%; object-fit:contain; display:block; }
 #ovSub{ position:absolute; left:50%; bottom:4%; transform:translateX(-50%); width:max-content; max-width:94%; padding:4px 12px; border-radius:8px; background:rgba(0,0,0,.88); color:#fff; font-weight:700; text-align:center; font-size:clamp(.9rem,2.2vw,1.3rem); pointer-events:none; }
 #ovSub:empty{ display:none; }
+/* 소개 영상·화면 해설: 모바일에서는 영상이 중심이 되도록 대화상자를 화면에 맞춤 */
+#ov .box{ display:flex; flex-direction:column; gap:8px; }
+#ov .box > p{ flex:0 0 auto; }
+#ovWrap{ width:100%; min-height:0; }
+#ovWrap video{ max-width:100%; }
+#ov .act{ flex:0 0 auto; }
+@media (max-width:900px), (max-height:600px){
+  #ov.dlg{ padding:0; align-items:stretch; }
+  #ov .box{ width:100%; height:100%; max-height:100%; border-radius:0; border-left:0; border-right:0; padding: max(8px, env(safe-area-inset-top,0px)) max(10px, env(safe-area-inset-right,0px)) max(8px, env(safe-area-inset-bottom,0px)) max(10px, env(safe-area-inset-left,0px)); gap:6px; }
+  #ov .head{ flex:0 0 auto; min-height:44px; }
+  #ov h2{ font-size:1.08rem; }
+  #ov .box > p{ margin:0; font-size:.88rem; line-height:1.4; }
+  #ovWrap{ flex:1 1 auto; width:100%; height:auto; max-height:none; aspect-ratio:auto; margin:2px 0; display:flex; align-items:center; justify-content:center; }
+  #ovWrap video{ width:100%; height:100%; object-fit:contain; }
+  #ovSub{ left:3%; right:3%; bottom:3%; width:auto; max-width:none; transform:none; padding:6px 9px; font-size:clamp(.82rem,2.4vh,1.08rem); line-height:1.35; }
+  #ov .act{ margin-top:0; padding-bottom:env(safe-area-inset-bottom,0px); }
+  #ov .act button{ flex:1 1 0; min-width:0; }
+}
+@media (max-width:520px) and (orientation:portrait){
+  html:not(.rot) #ov .box{ gap:5px; }
+  html:not(.rot) #ov .box > p{ font-size:.82rem; }
+  html:not(.rot) #ovWrap{ min-height:0; }
+}
 
 /* 8장 메뉴 · 거인의 눈 · 점수 */
 .chapters{ display:flex; flex-direction:column; gap:6px; }
