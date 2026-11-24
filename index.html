@@ -84,6 +84,27 @@ html.short .lv{ min-height:48px; padding:4px 8px; } html.short .lv small{ displa
 #sub b{ color:var(--acc); margin-right:.4em; }
 #sub:empty{ display:none; }
 html.hc #sub{ background:#000; border-color:var(--acc); }
+/* 모바일 가로 화면: 무대와 이미지 폭을 최대로 확보하고 자막을 하단 고정 패널로 분리 */
+@media (max-width: 900px), (max-height: 600px){
+  html.rot #app{ position:relative; display:block; width:var(--W); height:var(--H); }
+  html.rot #menu{ display:none; }
+  html.rot #stage{ position:absolute; inset:0; padding:0 0 29%; width:100%; height:100%; }
+  html.rot .view{ inset:0 0 29%; }
+  html.rot .view video{ width:100%; height:100%; object-fit:contain; }
+  html.rot #sub{ display:none; }
+  html.rot #side{ position:absolute; z-index:10; left:0; right:0; bottom:0; height:29%; min-height:0; display:flex; border:0; border-top:2px solid var(--acc); padding:0  max(12px, env(safe-area-inset-left,0px)) env(safe-area-inset-bottom,0px); background:rgba(15,13,10,.97); }
+  html.rot #chips{ display:none; }
+  html.rot #cap{ flex:1; min-height:0; overflow:hidden; padding:6px 12px 8px; }
+  html.rot #capWho{ display:block; font-size:.82rem; line-height:1.2; }
+  html.rot #capText{ max-height:4.8em; overflow-y:auto; overscroll-behavior:contain; scroll-behavior:smooth; margin:2px 0 0; font-size:clamp(1rem,2.8vh,1.3rem); line-height:1.55; }
+  html.rot #capText .ln{ display:block; }
+  html.rot #capText .ln.on{ background:transparent; color:var(--acc); }
+  html.rot #v2{ inset:0 0 29%; }
+  html.rot #frame{ width:min(100%, calc((var(--H) * .71) * 1.15)); height:100%; }
+  html.rot #frame img{ object-fit:contain; }
+  html.rot #whoPic{ top:8px; right:8px; }
+}
+
 /* 2부: 조각 사진과 탐색 지점 */
 #frame{ position:relative; }
 #frame img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
