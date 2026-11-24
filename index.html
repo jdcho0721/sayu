@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>반가워, 사유</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&family=Noto+Sans+KR:wght@500;700;900&display=swap">
+<script>
+/* 세로로 든 휴대폰은 화면 전체를 90도 돌려 가로처럼 보여 준다(침묵의 공명과 같은 가로 화면) */
+(function(){
+  var d = document.documentElement;
+  function fit(){
+    var w = innerWidth, h = innerHeight, rot = h > w && Math.min(w, h) < 820;
+    d.classList.toggle('rot', rot); d.classList.toggle('short', (rot ? w : h) < 520);
+    d.style.setProperty('--W', (rot ? h : w) + 'px'); d.style.setProperty('--H', (rot ? w : h) + 'px'); d.style.setProperty('--H0', w + 'px');
+  }
+  window.__fit = fit; fit(); addEventListener('resize', fit); addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+  var f = 0, hc = false; try{ f = +(localStorage.getItem('sayu8-fs') || 0); hc = localStorage.getItem('sayu8-hc') === '1'; }catch(e){}
+  d.style.setProperty('--fs', [1.2, 1.45, 1.75][f] || 1.2); if(hc) d.classList.add('hc');
+})();
+</script>
+<style>
+/* 반가워, 사유 · 소리로 만나는 3부 — 침묵의 공명과 같은 형태(가로 표지, 1·2·3부, 손끝 탐색, 화면 해설)
+   색: 어두운 전시실 바탕 + 금동의 금빛 하나. 본문 대비 7:1 이상, 누르는 곳 48px 이상, 초점 테두리 4px */
+:root{ --fs:1.2; --bg:#0f0d0a; --panel:#1a1712; --line:#5d5547; --ink:#fff; --soft:#ece6da; --dim:#d3cab8; --acc:#e8c164; --accInk:#1a1206; --hl:rgba(232,193,100,.24); --W:100vw; --H:100vh; }
+html.hc{ --bg:#000; --panel:#000; --line:#fff; --ink:#fff; --soft:#fff; --dim:#fff; --acc:#ffe14d; --accInk:#000; --hl:rgba(255,225,77,.3); }
+html{ font-size:calc(var(--fs) * 100%); }
+*{ box-sizing:border-box; }
+html, body{ margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:'Noto Sans KR','Apple SD Gothic Neo',system-ui,sans-serif; line-height:1.5; }
+html.rot, html.rot body{ overflow:hidden; }
+html.rot body{ position:fixed; top:0; left:0; width:var(--W); height:var(--H); transform:translateX(var(--H0)) rotate(90deg); transform-origin:top left; }
+button, a{ font:inherit; }
+button{ cursor:pointer; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+.sr{ position:absolute!important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+[hidden]{ display:none!important; }
+:focus-visible{ outline:4px solid var(--acc); outline-offset:3px; }
+h1:focus, h2:focus{ outline:none; }
+
+/* ── 표지: 닿을 듯 멈춘 두 손끝 사진을 가득, 오른쪽에 제목과 단추, 아래 한 줄에 바로가기 ── */
+#start{ position:fixed; inset:0; z-index:40; display:grid; grid-template-rows:minmax(0,1fr) auto; background:#000; overflow:hidden;
+  font-size:clamp(15px, min(calc(var(--H, 100vh) / 15), calc(var(--W, 100vw) / 30)), 30px); }
+#start .photo{ position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.15) 30%, rgba(12,9,5,.88) 52%, rgba(12,9,5,.95) 100%), url('cover.jpg') 18% 50%/cover no-repeat; }
+html.hc #start .photo{ background:#000; }
+#start .in{ position:relative; justify-self:end; width:min(52%, 24em); align-self:center; padding:.6em max(1em, env(safe-area-inset-right,0px)) .4em 0; }
+#start h1{ margin:0; font-family:'Nanum Myeongjo','Noto Serif KR',serif; font-weight:800; font-size:2.3em; line-height:1.1; color:#fff; white-space:nowrap; }
+#start .sub{ margin:.3em 0 .6em; font-size:.85em; font-weight:700; color:var(--dim); }
+#start .btns{ display:grid; grid-template-columns:1fr 1fr; gap:.4em; }
+.sbtn{ display:flex; flex-direction:column; align-items:flex-start; justify-content:center; min-height:48px; padding:.3em .6em; border-radius:.5em;
+  border:2px solid var(--dim); background:rgba(12,9,5,.75); color:#fff; font-size:.9em; font-weight:800; line-height:1.25; text-align:left; word-break:keep-all; }
+.sbtn small{ font-size:.7em; font-weight:700; color:var(--dim); }
+.sbtn.main{ grid-column:1 / -1; border-color:var(--acc); background:var(--acc); color:var(--accInk); font-size:1.35em; }
+.sbtn.main small{ color:var(--accInk); }
+#start .bar{ position:relative; display:flex; gap:.35em; padding:.35em max(.6em, env(safe-area-inset-left,0px)) calc(.35em + env(safe-area-inset-bottom,0px)); background:rgba(12,9,5,.92); border-top:2px solid var(--line); overflow-x:auto; }
+#start .bar button{ flex:1 0 auto; min-height:44px; padding:0 .7em; border-radius:999px; border:2px solid var(--line); background:transparent; color:#fff; font-size:.7em; font-weight:800; white-space:nowrap; }
+#start .bar button b{ color:var(--acc); }
+@media (orientation:portrait){ html:not(.rot) #start .in{ justify-self:stretch; width:auto; align-self:end; padding:1em; }
+  html:not(.rot) #start .photo{ background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(12,9,5,.9) 45%, rgba(12,9,5,.96) 100%), url('cover.jpg') 30% 0%/auto 45% no-repeat, #000; }
+  html:not(.rot) #start .bar{ flex-wrap:wrap; } }
+
+/* ── 본 화면: 왼쪽 메뉴, 오른쪽 무대, 무대 아래 단추 줄과 해설 글 ── */
+#app{ display:grid; grid-template-columns:min(max(9.5rem,18%),30%) minmax(0,1fr) min(max(13rem,30%),26rem); grid-template-rows:minmax(0,1fr); grid-template-areas:"menu stage side"; height:var(--H); width:var(--W); max-width:100%; }
+#side{ grid-area:side; display:flex; flex-direction:column; min-height:0; border-left:2px solid var(--line); background:var(--panel); padding-top:env(safe-area-inset-top,0px); padding-right:env(safe-area-inset-right,0px); }
+html:not(.rot) #app{ width:100%; height:100vh; height:100svh; }
+#menu{ grid-area:menu; display:flex; flex-direction:column; gap:7px; padding:calc(10px + env(safe-area-inset-top,0px)) 9px 10px calc(9px + env(safe-area-inset-left,0px)); border-right:2px solid var(--line); background:var(--panel); overflow:auto; }
+#menu > *{ flex-shrink:0; }
+html.short #menu{ gap:6px; } html.short #menu h2{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+html.short .lv{ min-height:48px; padding:4px 8px; } html.short .lv small{ display:none; } html.short .ib{ height:44px; min-width:44px; }
+#menu h2{ margin:0 4px; font-family:'Nanum Myeongjo',serif; font-size:1.15rem; line-height:1.25; }
+.lv{ display:flex; align-items:center; gap:9px; min-height:56px; padding:6px 9px; border:2px solid var(--line); border-radius:14px; background:transparent; color:var(--ink); text-align:left; }
+.lv b{ flex:0 0 auto; width:1.9rem; height:1.9rem; border-radius:50%; border:2px solid var(--acc); color:var(--acc); display:inline-flex; align-items:center; justify-content:center; font-size:.95rem; }
+.lv span{ display:flex; flex-direction:column; font-size:1.05rem; font-weight:900; line-height:1.2; word-break:keep-all; }
+.lv small{ font-size:.8rem; font-weight:700; color:var(--dim); }
+.lv[aria-current="true"]{ border-color:var(--acc); background:var(--hl); }
+.lv[aria-current="true"] b{ background:var(--acc); color:var(--accInk); }
+.row{ display:flex; gap:6px; flex-wrap:wrap; padding-top:7px; border-top:2px solid var(--line); }
+.ib{ min-width:48px; height:48px; border-radius:24px; border:2px solid var(--line); background:transparent; color:var(--ink); font-weight:800; font-size:.9rem; padding:0 11px; }
+.ib.on{ background:var(--acc); color:var(--accInk); border-color:var(--acc); }
+#stage{ grid-area:stage; position:relative; min-width:0; min-height:0; background:#000; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.view{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.view video{ width:100%; height:100%; object-fit:contain; background:#000; }
+#sub{ position:absolute; left:50%; bottom:4%; transform:translateX(-50%); max-width:92%; width:max-content; padding:6px 16px; border-radius:10px; background:rgba(0,0,0,.88); border:2px solid rgba(255,255,255,.35);
+  color:#fff; font-size:clamp(1rem, 2.6vw, 1.6rem); font-weight:700; line-height:1.4; text-align:center; word-break:keep-all; pointer-events:none; z-index:3; }
+#sub b{ color:var(--acc); margin-right:.4em; }
+#sub:empty{ display:none; }
+html.hc #sub{ background:#000; border-color:var(--acc); }
+/* 2부: 조각 사진과 탐색 지점 */
+#frame{ position:relative; }
+#frame img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
+#hot{ position:absolute; inset:0; touch-action:none; }
+.hs{ position:absolute; width:64px; height:64px; margin:-32px 0 0 -32px; border:0; padding:0; background:transparent; border-radius:50%; }
+.hs i{ display:flex; width:1.8rem; height:1.8rem; margin:auto; border-radius:50%; border:3px solid #fff; background:var(--acc); color:var(--accInk); font-style:normal; font-weight:900; font-size:1rem; align-items:center; justify-content:center; box-shadow:0 0 0 3px #000; transition:transform .15s; }
+.hs.seen i{ background:#fff; }
+.hs.on i{ transform:scale(1.35); box-shadow:0 0 0 3px #000, 0 0 0 7px var(--acc); }
+.hs .tip{ position:absolute; left:50%; top:100%; transform:translateX(-50%); white-space:nowrap; padding:3px 10px; border-radius:8px; background:#000; color:#fff; border:2px solid var(--acc); font-size:1rem; font-weight:800; display:none; pointer-events:none; }
+.hs.on .tip{ display:block; }
+#card{ position:absolute; left:8px; bottom:8px; max-width:min(40%, 18rem); padding:10px 14px; border-radius:14px; background:rgba(15,13,10,.94); border:2px solid var(--acc); color:#fff; font-weight:700; line-height:1.45; z-index:4; pointer-events:none; }
+#card b{ display:block; color:var(--acc); font-size:.85rem; }
+/* 3부: 고르기와 손 내밀기 */
+#v3{ flex-direction:column; gap:14px; padding:14px; background:radial-gradient(circle at 50% 40%, #2a2216 0%, #0f0d0a 70%); }
+.pick{ display:grid; grid-template-columns:1fr 1fr; gap:12px; width:min(100%, 36rem); }
+.pick button, .pad{ min-height:112px; border-radius:18px; border:3px solid var(--line); background:#1d1912; color:#fff; font-weight:900; font-size:1.35rem; line-height:1.3; padding:10px; word-break:keep-all; }
+.pick button small, .pad small{ display:block; font-size:.85rem; font-weight:700; color:var(--dim); }
+.pick button.keep{ border-color:var(--acc); }
+.pad{ width:min(100%, 36rem); min-height:min(44vh, 260px); touch-action:none; position:relative; overflow:hidden; border-color:var(--acc); }
+.pad .bar{ position:absolute; left:0; bottom:0; height:8px; width:0; background:var(--acc); transition:width .08s linear; }
+.pad.gap{ background:#3a2c12; }
+.pad.touch{ background:#4a1a14; }
+.who3{ color:var(--dim); font-weight:700; text-align:center; max-width:36rem; }
+#chips{ display:flex; flex-wrap:wrap; gap:8px; padding:8px 10px; border-bottom:2px solid var(--line); }
+#chips button{ flex:0 0 auto; min-height:48px; padding:4px 14px; border-radius:999px; border:2px solid var(--line); background:#000; color:var(--ink); font-size:1rem; font-weight:800; white-space:nowrap; }
+#chips button.go{ border-color:var(--acc); color:var(--acc); }
+#chips:empty{ display:none; }
+#cap{ flex:1; min-height:0; padding:8px 14px calc(10px + env(safe-area-inset-bottom,0px)); overflow:auto; }
+#capWho{ font-size:.9rem; font-weight:900; color:var(--acc); }
+#capText{ margin:2px 0 0; font-size:1.15rem; line-height:1.6; color:var(--soft); word-break:keep-all; }
+.ln{ border-radius:4px; } .ln.on{ color:#fff; background:var(--hl); }
+#backBtn{ border-color:#fff; }
+
+/* ── 창: 작품 소개 · 소개 영상 · 설정 ── */
+.dlg{ position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.9); display:flex; align-items:center; justify-content:center; padding:10px; }
+html.rot .dlg{ position:absolute; }
+.dlg .box{ width:min(860px,100%); max-height:100%; overflow:auto; background:#0f0d0a; border:2px solid var(--line); border-radius:16px; padding:16px 20px; font-size:1.05rem; line-height:1.7; color:var(--soft); word-break:keep-all; }
+.dlg .head{ display:flex; align-items:center; gap:10px; } .dlg h2{ flex:1; margin:0; color:var(--acc); font-size:1.3rem; }
+.dlg h3{ margin:14px 0 4px; font-size:1.05rem; color:#fff; } .dlg p{ margin:4px 0; } .dlg b{ color:#fff; } .dlg a{ color:var(--acc); }
+.dlg .x, .dlg .act button{ min-height:48px; padding:6px 16px; border-radius:12px; border:2px solid var(--line); background:#000; color:#fff; font-weight:800; }
+.dlg .act{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; } .dlg .act button.ok{ background:var(--acc); color:var(--accInk); border-color:var(--acc); }
+.sets{ display:grid; grid-template-columns:repeat(auto-fill, minmax(9em,1fr)); gap:8px; margin-top:8px; }
+.sets button{ min-height:52px; border-radius:12px; border:2px solid var(--line); background:#000; color:#fff; font-weight:800; text-align:left; padding:6px 12px; }
+.sets button span{ color:var(--acc); }
+#ovWrap{ position:relative; background:#000; border-radius:10px; overflow:hidden; margin-top:8px; aspect-ratio:16/9; max-height:calc(var(--H) - 210px); }
+#ovWrap video{ width:100%; height:100%; object-fit:contain; display:block; }
+#ovSub{ position:absolute; left:50%; bottom:4%; transform:translateX(-50%); width:max-content; max-width:94%; padding:4px 12px; border-radius:8px; background:rgba(0,0,0,.88); color:#fff; font-weight:700; text-align:center; font-size:clamp(.9rem,2.2vw,1.3rem); pointer-events:none; }
+#ovSub:empty{ display:none; }
+
+/* 8장 메뉴 · 거인의 눈 · 점수 */
+.chapters{ display:flex; flex-direction:column; gap:6px; }
+html.short .chapters{ display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+html.short .chapters .lv{ flex-direction:column; justify-content:center; gap:1px; min-height:50px; padding:3px 2px; text-align:center; }
+html.short .chapters .lv b{ width:1.35rem; height:1.35rem; font-size:.72rem; }
+html.short .chapters .lv span{ font-size:.74rem; word-break:normal; align-items:center; }
+html.short .tools{ flex-wrap:nowrap; gap:4px; } html.short .tools .ib{ flex:1; min-width:0; padding:0 4px; font-size:.75rem; }
+#eye{ position:absolute; left:8px; top:8px; z-index:4; padding:4px 12px; border-radius:999px; background:#000; border:2px solid var(--line); color:#fff; font-weight:800; font-size:.95rem; pointer-events:none; }
+#eye.look{ border-color:#ef968c; color:#ffd7cf; }
+.pick.one{ grid-template-columns:1fr; width:min(100%, 22rem); }
+#v3{ overflow:auto; justify-content:flex-start; } #v3 > :first-child{ margin-top:auto; } #v3 > :last-child{ margin-bottom:auto; }
+.score{ width:min(100%, 36rem); margin:auto; color:var(--soft); }
+.score p{ margin:2px 0; } .score .big{ font-size:1.5rem; font-weight:900; } .score .big b, .score .end b{ color:var(--acc); }
+.score ul{ list-style:none; padding:0; margin:8px 0; display:grid; gap:5px; }
+.score li{ font-size:.95rem; display:grid; grid-template-columns:1fr auto; gap:0 10px; padding:5px 10px; border:1px solid var(--line); border-radius:10px; }
+.score li small{ grid-column:1 / -1; color:var(--dim); font-size:.85rem; }
+#whoPic{ position:absolute; right:10px; top:10px; z-index:5; width:min(24%, 8.5rem); aspect-ratio:3/4; border-radius:14px; overflow:hidden; border:2px solid var(--acc); background:#000; }
+#whoPic img{ width:100%; height:100%; object-fit:cover; object-position:50% 15%; display:block; }
+#whoPic span{ position:absolute; left:0; right:0; bottom:0; padding:2px 4px; background:rgba(0,0,0,.82); color:#fff; font-weight:800; font-size:.8rem; text-align:center; }
+.portrait{ height:min(34%, 13rem); aspect-ratio:3/4; object-fit:cover; object-position:50% 15%; border-radius:14px; border:2px solid var(--line); flex-shrink:0; }
+html.short .portrait{ height:38%; }
+</style>
+</head>
+<body>
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+
+<!-- 표지 -->
+<div id="start" role="region" aria-label="표지">
+  <div class="photo" aria-hidden="true"></div>
+  <div class="in">
+    <h1>반가워, 사유</h1>
+    <p class="sub">소리로 만나는 판 · 8장 · 약 15분</p>
+    <div class="btns">
+      <button type="button" class="sbtn main" id="goVoice" aria-label="시작하기. 음성 해설과 자막으로 프롤로그부터 합니다">시작하기<small>음성 해설과 자막으로</small></button>
+      <button type="button" class="sbtn" id="goSR" aria-label="화면 읽기 사용. VoiceOver나 TalkBack을 쓰는 분">화면 읽기 사용<small>VoiceOver·TalkBack</small></button>
+      <button type="button" class="sbtn" id="goQuiet" aria-label="소리 없이 보기. 글과 자막으로만 봅니다">소리 없이 보기<small>글과 자막으로만</small></button>
+    </div>
+  </div>
+  <nav class="bar" aria-label="바로가기">
+    <button type="button" data-go="1"><b>1</b> 프롤로그</button>
+    <button type="button" data-go="3"><b>3</b> 거인의 동굴</button>
+    <button type="button" data-go="4"><b>4</b> 청동 전시실</button>
+    <button type="button" data-go="7"><b>7</b> 사유 만남</button>
+    <button type="button" data-open="chap">장 고르기</button>
+    <button type="button" data-open="about">작품 소개</button>
+    <button type="button" data-open="ov">소개 영상</button>
+    <button type="button" data-open="set">설정</button>
+  </nav>
+</div>
+
+<main id="app" inert>
+  <nav id="menu" aria-label="메뉴">
+    <h2 id="appTitle" tabindex="-1">반가워, 사유</h2>
+    <div class="chapters" role="group" aria-label="장 고르기"></div>
+    <div class="row" role="group" aria-label="해설 조절">
+      <button type="button" class="ib" id="pauseBtn" aria-label="해설 일시정지"><span aria-hidden="true" id="pauseIcon">❚❚</span></button>
+      <button type="button" class="ib" id="againBtn" aria-label="방금 해설 다시 듣기"><span aria-hidden="true">↺</span></button>
+    </div>
+    <div class="row tools">
+      <button type="button" class="ib" data-open="about">소개</button>
+      <button type="button" class="ib" data-open="set">설정</button>
+      <button type="button" class="ib" id="backBtn" aria-label="표지로 돌아가기">처음</button>
+    </div>
+  </nav>
+  <section id="stage" aria-label="무대">
+    <div class="view" id="v1" hidden><video id="vid1" src="intro.mp4" poster="p1.jpg" playsinline preload="metadata" aria-label="프롤로그 영상, 약 1분 40초. 화면 해설과 인물의 목소리가 담겨 있습니다"></video></div>
+    <div class="view" id="v2" hidden>
+      <div id="frame"><img src="sayu.jpg" alt="" aria-hidden="true"><div id="hot" role="group" aria-label="탐색 지점"></div></div>
+      <div id="eye" hidden aria-hidden="true"></div>
+      <div id="card" hidden aria-hidden="true"></div>
+    </div>
+    <div class="view" id="v3" hidden></div>
+    <div class="view" id="vClip" hidden><video id="vidClip" playsinline preload="metadata" aria-label="장면 영상"></video></div>
+    <div class="view" id="vEnd" hidden><video id="vidEnd" playsinline preload="metadata" aria-label="엔딩 영상"></video></div>
+    <div id="sub" aria-hidden="true"></div>
+    <div id="whoPic" hidden aria-hidden="true"><img alt=""><span></span></div>
+  </section>
+  <aside id="side" aria-label="이어 가기와 해설 글">
+    <nav id="chips" aria-label="이어 가기"></nav>
+    <div id="cap" aria-hidden="true"><span id="capWho"></span><p id="capText"></p></div>
+  </aside>
+</main>
+
+<!-- 장 고르기 -->
+<div class="dlg" id="chap" role="dialog" aria-modal="true" aria-labelledby="chapH" hidden><div class="box">
+  <div class="head"><h2 id="chapH" tabindex="-1">장 고르기</h2><button type="button" class="x" data-close>✕ 닫기</button></div>
+  <p>고른 장부터 시작합니다. 하지 않은 시련은 기본 점수를 받습니다.</p>
+  <div class="sets" id="chapList" role="group" aria-label="여덟 장"></div>
+</div></div>
+
+<!-- 작품 소개 -->
+<div class="dlg" id="about" role="dialog" aria-modal="true" aria-labelledby="aboutH" hidden><div class="box">
+  <div class="head"><h2 id="aboutH" tabindex="-1">작품 소개 · 반가워, 사유</h2><button type="button" class="x" data-close>✕ 닫기</button></div>
+  <p>달밤의 박물관 정원, 백 년 동안 턱을 괴고 굳어 있던 녹슨 청동상이 당신입니다. 유리장 속에는 작은 금동반가사유상, 사유가 있습니다. 수집가 유태양은 해가 뜨면 사유의 흠을 갈아 없애 새것처럼 팔려 하고, 흙손 영감은 흠과 흔적을 지키라고 합니다.</p>
+  <p>모두 8장입니다. <b>프롤로그</b> 영상으로 이야기를 듣고, <b>사유의 모습</b>을 손끝으로 만난 뒤, 두 시련 <b>외눈 거인의 동굴</b>과 <b>청동 전시실</b>(1방 · 2방)을 넘습니다. <b>마지막 제안</b>에서 흠을 지킬지 고르고, <b>사유 만남</b>에서 닿을 듯 멈춘 손끝에서 사유를 만납니다. 마지막에 <b>점수</b>에 따라 세 엔딩 가운데 하나를 봅니다.</p>
+  <h3>만든 사람</h3>
+  <p>성균관대학교 HCI 설계 D조 · 오규태, 공현민, 이건혁, Zhiqiang Shen</p>
+  <p>지도교수 · 조준동</p>
+  <p>은유 장면 Higgsfield(Seedance) · 목소리와 화면 해설 Gemini TTS · 일부 장면은 AI로 생성했습니다.</p>
+  <h3>적용한 작품</h3>
+  <p>헨리 무어 연구소 《Beyond the Visual》 오디오 가이드 · documenta fifteen 프로젝트 아트 워크스 · 로렌스 아부 함단의 청각 작업(방법만) · 아론 맥피크 《Rings》 · documenta 6 발터 드 마리아 《수직 대지의 킬로미터》 · 팀랩 플래닛 · documenta 5 하랄트 제만.</p>
+  <h3>보면서 하는 판</h3>
+  <p>그림과 글로 하는 원래 게임은 <a href="https://rjsgur63.github.io/banga-sayu/">rjsgur63.github.io/banga-sayu</a> 에서 할 수 있습니다.</p>
+  <h3>작품 소개 영상</h3>
+  <p>사유의 목소리에 화면 해설을 더한 약 2분 10초 영상입니다.</p>
+  <div class="act"><button type="button" class="ok" id="aboutSay">▶ 소리로 듣기</button><button type="button" class="ok" data-open="ov">▶ 소개 영상 보기</button><button type="button" data-close>닫기</button></div>
+</div></div>
+
+<!-- 소개 영상 -->
+<div class="dlg" id="ov" role="dialog" aria-modal="true" aria-labelledby="ovH" hidden><div class="box">
+  <div class="head"><h2 id="ovH" tabindex="-1">소개 영상 · 화면 해설판</h2><button type="button" class="x" data-close>✕ 닫기</button></div>
+  <p>사유가 들려주는 「반가워, 사유」 소개에 화면 해설을 더한 약 2분 10초 영상입니다. 해설은 남자 목소리, 사유는 여자 목소리입니다. 영상 속 게임 화면은 이 소리로 만나는 판의 화면입니다.</p>
+  <div id="ovWrap"><video id="ovVid" src="overview.mp4" poster="cover.jpg" playsinline preload="none" aria-label="소개 영상, 화면 해설판, 약 2분 10초"></video><div id="ovSub" aria-hidden="true"></div></div>
+  <div class="act"><button type="button" class="ok" id="ovPlay">▶ 소개 영상 재생</button><button type="button" data-close>닫기</button></div>
+</div></div>
+
+<!-- 설정 -->
+<div class="dlg" id="set" role="dialog" aria-modal="true" aria-labelledby="setH" hidden><div class="box">
+  <div class="head"><h2 id="setH" tabindex="-1">설정과 사용법</h2><button type="button" class="x" data-close>✕ 닫기</button></div>
+  <div class="sets" role="group" aria-label="설정">
+    <button type="button" id="helpSay">▶ <span>사용법 듣기</span></button>
+    <button type="button" id="rateBtn" aria-label="말 빠르기">말 빠르기 <span id="rateNow">보통</span></button>
+    <button type="button" id="fsBtn">글자 크기 <span id="fsNow">가</span></button>
+    <button type="button" id="hcBtn" aria-pressed="false">고대비 <span id="hcNow">꺼짐</span></button>
+    <button type="button" id="ccBtn" aria-pressed="true">자막 <span id="ccNow">켜짐</span></button>
+    <button type="button" id="voiceBtn" aria-pressed="true">앱 음성 <span id="voiceNow">켜짐</span></button>
+    <button type="button" id="vibBtn">진동 시험</button>
+  </div>
+  <p id="vibMsg" role="status"></p>
+  <h3>사용법</h3>
+  <p id="helpText"></p>
+  <div class="act"><button type="button" class="ok" data-close>닫기</button></div>
+</div></div>
+
+<script>
+{
+/* ───────── 원고 ───────── */
+const CUES = {"intro": [{"s": 0.4, "e": 2.72, "w": "해설", "t": "달밤의 박물관 정원."}, {"s": 2.72, "e": 9.89, "w": "해설", "t": "돌 받침 위에 녹슨 청동상 하나가 턱을 괸 채 앉아 있습니다."}, {"s": 10.24, "e": 15.42, "w": "흙손 영감", "t": "백 년 동안 턱을 괴고 굳어 있던 청동상."}, {"s": 15.42, "e": 17.45, "w": "흙손 영감", "t": "그게 바로 너다."}, {"s": 18.45, "e": 20.85, "w": "해설", "t": "창 너머 어두운 전시실."}, {"s": 20.85, "e": 28.22, "w": "해설", "t": "유리장 속 작은 금동상이 빛나고, 그 위로 사유의 모습이 겹쳐 보입니다."}, {"s": 28.57, "e": 35.86, "w": "흙손 영감", "t": "창 너머 유리장 속의 저 아이를, 사람들은 사유라 부른다."}, {"s": 36.86, "e": 44.27, "w": "해설", "t": "불이 하나둘 꺼지고, 등불을 든 남자 유태양이 정원으로 걸어 들어옵니다."}, {"s": 44.62, "e": 47.52, "w": "유태양", "t": "해가 뜨면 저 상은 내 수장고로 간다."}, {"s": 47.52, "e": 50.83, "w": "유태양", "t": "흠은 전부 갈아 없애고 새것처럼 만들어야지."}, {"s": 50.83, "e": 53.17, "w": "유태양", "t": "흠 있는 건 값이 안 나가거든."}, {"s": 54.17, "e": 59.46, "w": "해설", "t": "유태양이 돌아서서, 청동상인 당신을 손가락으로 가리킵니다."}, {"s": 59.81, "e": 61.64, "w": "유태양", "t": "저 상은 곧 내 차지다."}, {"s": 61.64, "e": 65.3, "w": "유태양", "t": "막고 싶으면 내가 내리는 시련을 전부 끝내 봐."}, {"s": 65.3, "e": 67.42, "w": "유태양", "t": "그러면 유리장을 열어 주지."}, {"s": 68.42, "e": 75.91, "w": "해설", "t": "석등 사이 그림자 속에서, 천에 싼 청동 그릇을 든 노인 흙손 영감이 걸어 나옵니다."}, {"s": 76.26, "e": 84.43, "w": "흙손 영감", "t": "해 뜨기 전까지 시련을 넘어, 저 아이의 흠과 흔적을 지켜라."}, {"s": 85.43, "e": 93.36, "w": "해설", "t": "녹슨 청동 손이 빛나는 유리장을 향해 천천히 뻗다가, 닿기 직전에 멈춥니다."}, {"s": 87.64, "e": 97.57, "w": "", "t": "반가워, 사유"}, {"s": 93.36, "e": 94.87, "w": "해설", "t": "반가워, 사유."}], "overview": [{"s": 0.6, "e": 7.68, "w": "해설", "t": "어둠 속, 녹슨 청동 손끝과 사람 손끝이 마주 보고, 그 틈에 금빛 빛줄기가 섭니다."}, {"s": 11.43, "e": 14.93, "w": "해설", "t": "뜨거운 쇳물이 흙 거푸집으로 흘러 들어갑니다."}, {"s": 15.45, "e": 19.64, "w": "사유", "t": "천사백 년 전, 나는 불 속에서 흠을 얻으며 태어났어."}, {"s": 19.98, "e": 25.65, "w": "해설", "t": "금동 옷자락이 비치고, 유리장 안에 사유가 뺨에 손을 대고 앉아 있습니다."}, {"s": 27.49, "e": 30.98, "w": "사유", "t": "「반가워, 사유」는 유리장 속의 나를 눈이 아니라"}, {"s": 31.35, "e": 43.26, "w": "해설", "t": "청동 손바닥이 유리에 닿자 빛 물결이 번집니다. 게임 화면. 금동상 사진 위에 번호 동그라미 다섯 개. 손끝으로 더듬으면 자리마다 이름이 들립니다."}, {"s": 43.86, "e": 45.4, "w": "사유", "t": "몸으로 만나는 게임이야."}, {"s": 45.96, "e": 56.56, "w": "해설", "t": "어둠 속, 거대한 외눈이 빛줄기를 내뿜습니다. 게임 화면. 조각상의 빈 자리 세 곳에, 거인이 돌아선 사이 조각을 붙입니다."}, {"s": 57.18, "e": 60.84, "w": "사유", "t": "외눈 거인의 눈을 피해 내 조각을 맞춰 줘."}, {"s": 61.71, "e": 72.15, "w": "해설", "t": "청동 고리 다섯 개가 나란히 매달려 있습니다. 게임 화면. 조각상의 세 자리를 두드려 고리 소리를 듣고, 가장 큰 고리를 고릅니다."}, {"s": 72.94, "e": 77.28, "w": "사유", "t": "청동 전시실에서는 고리를 두드리고 손을 얹어,"}, {"s": 77.95, "e": 82.31, "w": "해설", "t": "사유의 손끝에서 금빛 실이 흘러나와 청동 손에 닿습니다."}, {"s": 82.79, "e": 84.71, "w": "사유", "t": "귀와 손으로 내 속을 읽어."}, {"s": 85.41, "e": 94.0, "w": "해설", "t": "손바닥 위 휴대폰에 빛이 번집니다. 게임 화면. 이대로 간다, 지운다, 큰 단추 두 개가 놓여 있습니다."}, {"s": 94.64, "e": 99.82, "w": "사유", "t": "화면을 보지 않아도 소리와 진동만으로 끝까지 갈 수 있는 시각장애인판도 있어."}, {"s": 100.55, "e": 105.8, "w": "해설", "t": "벚꽃 나무 아래, 녹슨 청동 두 손이 웃는 사유에게 다가갑니다."}, {"s": 106.43, "e": 107.52, "w": "사유", "t": "그리고 마지막엔,"}, {"s": 108.05, "e": 110.92, "w": "사유", "t": "닿을 듯 멈춘 그 자리에서 나를 만나 줘."}, {"s": 111.05, "e": 115.67, "w": "해설", "t": "두 손끝이 닿기 직전에 멈추고, 꽃잎 하나가 내려앉습니다."}, {"s": 116.47, "e": 119.84, "w": "해설", "t": "벚꽃 나무 아래, 사유가 돌아보며 웃습니다."}, {"s": 120.77, "e": 121.79, "w": "사유", "t": "반가워, 사유."}, {"s": 123.79, "e": 126.69, "t": "[제목] 반가워, 사유"}, {"s": 123.99, "e": 126.11, "w": "해설", "t": "제목, 반가워, 사유."}, {"s": 126.89, "e": 131.98, "w": "해설", "t": "브라우저에서 바로, 시각장애인판 함께. HCI 설계 D조."}], "best": [{"s": 0.4, "e": 2.46, "w": "해설", "t": "해 뜨는 벚꽃 정원."}, {"s": 2.46, "e": 8.47, "w": "해설", "t": "사유가 두 손으로 당신의 청동 손을 꼭 잡고 올려다봅니다."}, {"s": 9.47, "e": 15.02, "w": "해설", "t": "사유가 눈을 감고, 당신의 손등에 이마를 살며시 댑니다."}, {"s": 15.31, "e": 15.97, "w": "사유", "t": "좋아해."}, {"s": 15.97, "e": 17.14, "w": "사유", "t": "앞으로도 쭉."}, {"s": 18.14, "e": 29.78, "w": "해설", "t": "금빛 햇살 속에서 사유와 청동상이 손을 맞잡고 나란히 서 있고, 꽃잎이 둘 주위를 맴돕니다."}], "good": [{"s": 0.4, "e": 6.4, "w": "해설", "t": "사유가 받침에서 일어나, 수줍게 웃으며 당신에게 걸어옵니다."}, {"s": 7.4, "e": 16.31, "w": "해설", "t": "사유가 당신의 청동 손을 감싸 쥐자, 닿은 자리부터 푸른 녹이 따뜻한 금빛으로 바뀝니다."}, {"s": 17.31, "e": 23.67, "w": "해설", "t": "꽃잎 아래, 눈가가 촉촉해진 사유가 활짝 웃습니다."}, {"s": 24.02, "e": 26.58, "w": "사유", "t": "이제 너를 알아볼 수 있어."}, {"s": 26.58, "e": 28.63, "w": "사유", "t": "네 손의 흠까지 전부."}], "normal": [{"s": 0.4, "e": 3.31, "w": "해설", "t": "새벽, 벚꽃이 흩날리는 정원."}, {"s": 3.31, "e": 8.04, "w": "해설", "t": "사유가 둥근 받침에 앉아 당신을 보며 웃습니다."}, {"s": 9.04, "e": 17.34, "w": "해설", "t": "당신의 청동 손과 사유의 손이 서로 다가가다, 손끝 사이를 조금 남기고 멈춥니다."}, {"s": 17.69, "e": 19.33, "w": "사유", "t": "또 와 줄 거지?"}, {"s": 19.33, "e": 23.18, "w": "사유", "t": "그때도 이 자리에서, 닿을 듯 말 듯."}, {"s": 24.18, "e": 28.55, "w": "해설", "t": "사유가 떠오르는 해를 바라보며 웃습니다."}]};
+const CH = [null,
+  { n:'프롤로그', s:'화면 해설 영상' },
+  { n:'사유의 모습', s:'손끝 탐색' },
+  { n:'거인의 동굴', s:'첫째 시련' },
+  { n:'전시실 1방', s:'울리는 조각' },
+  { n:'전시실 2방', s:'보이지 않는 깊이' },
+  { n:'마지막 제안', s:'흠을 지킬까' },
+  { n:'사유 만남', s:'유리장이 열린다' },
+  { n:'점수 · 엔딩', s:'세 갈래 엔딩' }];
+const HELP = '모두 8장입니다. 왼쪽 메뉴에서 장을 고르고, 오른쪽 단추로 다음으로 넘어갑니다. 단추를 길게 누르면 이름만 들립니다. 사진 위를 손끝으로 천천히 더듬으면 지점에서 이름이 들리고, 같은 자리를 한 번 더 두드리면 고릅니다.';
+const WELCOME = '반가워, 사유. 모두 8장, 15분쯤 걸립니다.';
+const T = {
+  p1:'1장, 프롤로그. 달밤의 박물관 정원에서 시작합니다.',
+  p2:'2장, 사유의 모습. 둥근 받침에 걸터앉아 오른발을 왼무릎에 올리고, 손끝을 뺨 가까이 든 금동상입니다. 사진 위를 더듬어 다섯 곳을 찾아보세요. 같은 자리를 한 번 더 두드리면 자연에 빗댄 비유가, 또 한 번 두드리면 그 비유를 닮은 자연의 소리가 들립니다.',
+  p2all:'다섯 곳을 모두 만났습니다. 다음 단추로 넘어가세요.',
+  g0:'3장, 외눈 거인의 동굴. 사유의 몸에서 조각 셋이 떨어져 나갔습니다. 거인 몰래 제자리에 붙여야 합니다.',
+  gHow:'빈 자리는 머리 위, 뺨 옆, 무릎 위 세 곳입니다. 숨소리가 들리면 거인이 보는 중이니 숨죽이고 기다리기를 누르고, 종소리가 나면 조각을 붙이세요. 처음 한 번은 연습입니다.',
+  gPractice:'쿵, 쿵. 거인이 이쪽을 봅니다. 숨죽이고 기다리기를 누르세요.',
+  gAlert:'쿵, 쿵. 거인이 이쪽을 봅니다. 숨죽이고 기다리기를 누르세요.',
+  gAwayFirst:'종소리. 거인이 돌아섰습니다.',
+  gAway:'종소리. 거인이 돌아섰습니다.',
+  gStillAway:'거인은 돌아서 있습니다. 지금 붙이세요.',
+  gCaughtPractice:'들켰습니다. 연습이라 괜찮습니다. 숨죽이고 기다리기를 누르세요.',
+  gCaught:'들켰습니다! 조각이 튕겨 나왔습니다. 숨죽이고 기다리기를 누르세요.',
+  gNoPiece:'든 조각이 없습니다. 숨죽이고 기다리기를 누르세요.',
+  gWho:'조각 셋을 다 붙였습니다. 거인이 소리칩니다. 네 이름이 무엇이냐!',
+  gOut:'신화 속 오디세우스가 외눈 거인에게 했던 대답입니다. 거인이 아무도 아닌 자를 찾아 헤매는 사이, 바위 틈으로 빠져나왔습니다.',
+  r1:'4장, 전시실 1방, 울리는 조각. 이 방에는 사유의 몸 다섯 곳, 관, 얼굴, 손, 옷주름, 다리를 본뜬 청동 고리가 하나씩 걸려 있습니다. 몸에서 넓은 곳일수록 고리가 크고, 큰 고리일수록 낮고 길게 웁니다.',
+  r1q:['첫째 물음. 조각상 사진의 손, 옷주름, 얼굴 자리에 그 부분을 본뜬 고리가 있습니다. 세 자리를 두드려 들어 보고, 가장 큰 고리를 찾으세요. 큰 고리는 낮고 길게 웁니다. 찾으면 한 번 더 두드리세요.',
+       '둘째 물음. 이번에는 다리, 얼굴, 관 자리입니다. 셋 가운데 가장 작은 고리를 찾으세요. 작은 고리는 높고 짧게 웁니다.'],
+  r1right:['맞았습니다. 옷주름 고리가 가장 큽니다.', '맞았습니다. 관 고리가 가장 작습니다. 두 번 다 맞혀, 두드린 청동 고리가 손끝의 온기로 따뜻해졌습니다.'],
+  r1wrong:['아닙니다. 더 낮게 우는 고리가 있습니다.', '아닙니다. 더 높게 우는 고리가 있습니다.'],
+  r1wrong2:['세 고리를 차례로 다시 들어 보세요.', '세 고리를 차례로 다시 들어 보세요.'],
+  r2:'5장, 전시실 2방, 보이지 않는 깊이. 사유의 몸속에 숨은 흔적 두 가지를 소리로 찾습니다.',
+  r2How:'사진 위를 더듬으면 자리마다 똑 소리가 납니다. 흔적에 가까울수록 똑 소리가 빠르고 높아집니다. 가장 빠르고 높은 자리를 두드려 파세요.',
+  r2task:['첫째 흔적. 자리는 두 곳입니다.', '둘째 흔적. 자리는 세 곳입니다.'],
+  r2found:['속이 빈 자리를 찾았습니다. 쇳물을 부을 때 몸속을 비워 둔 흔적입니다.', '다시 부어 고친 흔적을 찾았습니다. 깨진 곳을 쇳물로 메운 자리입니다.'],
+  r2end:'흙손 영감이 말합니다. 됐다. 이제 그 아이에게 가자.',
+  o0:'6장, 마지막 제안. 수집가 유태양이 유리장 열쇠를 쥐고 앞을 막습니다.',
+  oAsk:'흠을 지울까요, 이대로 갈까요? 왼쪽은 이대로 간다, 오른쪽은 지운다입니다.',
+  oErased:'흠이 없어지자 사유가 당신을 알아보지 못합니다. 돌아가 다시 고르세요.',
+  oKeep:'유태양이 혀를 차며 돌아섭니다.',
+  m0open:'유리장이 열리고, 사유가 처음으로 당신 앞에 섭니다.',
+  m1:'사유가 손을 내밉니다. 당신의 청동 손도 천천히 다가가, 닿기 직전에 멈춥니다. 손끝과 손끝 사이에 아주 좁은 틈이 남습니다.',
+  mHow:'게임하는 법입니다. 화면 가운데에 손 내밀기라는 큰 단추가 있어요. 첫째, 그 단추를 손가락으로 꾹 누른 채 기다리세요. 내 손이 사유에게 다가가면서 소리가 점점 높아집니다. 둘째, 소리가 부르르 떨리고 휴대폰도 떨리면, 바로 손가락을 떼세요. 그러면 손이 닿기 직전에 멈춥니다. 너무 빨리 떼면 아직 멀고, 너무 늦게 떼면 손이 닿아 버려요. 이렇게 세 번 하면 됩니다. 떨리는 소리는 오른쪽 떨리는 소리 들어 보기 단추로 먼저 들어 볼 수 있어요. 화면 읽기를 쓰면 단추를 한 번 눌러 시작하고, 떨리는 소리가 나면 한 번 더 누르세요.',
+  mEarly:'너무 빨리 뗐어요. 아직 멀어요. 다시 꾹 누르고, 떨리는 소리가 날 때까지 기다리세요.',
+  mTouch:'너무 늦어서 손이 닿았어요. 다시 꾹 누르고, 떨리는 소리가 나자마자 떼세요.',
+  mStop:['잘했어요. 닿기 직전에 멈췄습니다. 세 번 중 한 번. 다시 꾹 눌러 두 번째를 해 보세요.', '또 멈췄습니다. 세 번 중 두 번. 이번에는 떨리는 시간이 조금 짧아요. 마지막 한 번입니다.', '세 번째도 닿기 직전에 멈췄습니다.']
+};
+const ABOUT_SAY = '반가워, 사유. 백 년 동안 턱을 괴고 굳어 있던 녹슨 청동상이 당신입니다. 유리장 속 금동반가사유상, 사유를 만나러 갑니다. 수집가 유태양은 사유의 흠을 지워 팔려 하고, 흙손 영감은 흠을 지키라고 합니다. 모두 8장, 점수에 따라 세 엔딩 가운데 하나를 봅니다. 만든 사람은 성균관대학교 HCI 설계 D조, 오규태, 공현민, 이건혁, Zhiqiang Shen, 지도교수 조준동입니다.';
+const CLIP = {
+  r_cave:['유태양', '외눈 거인의 동굴이다. 그 눈에 띄면 조각이 튕겨 나간다.'],
+  s_thanks:['사유', '내 모습을 제대로 봐 줘서 되찾았어. 고마워.'],
+  g_rings:['흙손 영감', '두드려 봐라. 큰 고리는 낮고 길게, 작은 고리는 높고 짧게 운다. 손을 얹으면 멎고, 오래 쥐면 데워진다. 청동도 손을 기억해.'],
+  g_ringsend:['흙손 영감', '들었냐. 다섯 소리가 다 다르다. 흠 난 자리도 제 소리를 낸다. 유리장 안의 그 아이도 제 소리를 들어 줄 사람을 기다리고 있다.'],
+  g_eyes:['흙손 영감', '이제 눈을 감아 봐라. 저 아래선 소리가 어느 쪽 귀로 오는지, 떨림이 얼마나 빨라지는지만 믿으면 된다.'],
+  s_found:['사유', '보지 않고도 내 속을 찾아냈구나. 흠까지 알아봐 줘서 고마워.'],
+  v_offer:['유태양', '열쇠를 넘겨. 대신 상처를 전부 지워 주지. 흠 없는 몸으로 저 상 곁에 있어.'],
+  v_rivalexit:['유태양', '흠투성이군. 값이 안 나가.'],
+  v_meetfirst:['사유', '나도 조금 떨려. 그래도 함께라면, 잃어버린 모습을 다시 찾을 수 있을 것 같아.'],
+  s_tremble:['사유', '느꼈어? 거의 느껴지지 않을 만큼 작은 떨림. 그 틈에서 나는 생각해.'],
+  v_gap:['사유', '그 틈이 전부야. 닿을 듯 멈춘 그 자리가 사유야.'],
+  v_crown:['사유', '장식을 덜어낸 거야. 시선이 관이 아니라 내 얼굴과 손으로 가도록.'],
+  v_slow:['사유', '그럼 서두르지 않아도 좋아. 내 손끝과 미소부터 천천히 기억해 줘.'],
+  v_hand:['사유', '내 손끝. 뺨에 닿았다고 생각했어, 아니면 떨어져 있었어?']
+};
+/* 2장 · 사유의 모습: x, y는 사진 왼쪽 위에서부터의 백분율. 오른쪽 · 왼쪽은 사유 몸의 오른쪽 · 왼쪽 */
+const FORM = [
+  { x:50, y:10, n:'낮은 관', at:'맨 위 가운데', d:'머리에 쓴 낮은 관입니다. 완만한 봉우리 세 개가 나란히 솟아 있습니다.', m:'새벽 안개 속에 나란히 선 세 봉우리', s:'wind', sn:'산등성이를 넘는 바람 소리', clip:'v_crown' },
+  { x:54, y:19, n:'얼굴과 미소', at:'관 바로 아래', d:'눈을 가늘게 뜨고 고개를 살짝 숙였습니다. 입가에 옅은 웃음이 있습니다.', m:'바람이 잦아든 새벽 호수의 잔잔한 물결', s:'lake', sn:'잔잔한 호숫가 물결 소리', clip:'v_slow' },
+  { x:40, y:29, n:'뺨 가까이 든 손끝', at:'얼굴 왼쪽 옆', d:'오른손 손끝이 뺨을 향해 있지만, 손끝과 뺨 사이에 아주 좁은 틈이 남아 닿지 않습니다.', m:'꽃잎에 내려앉기 직전, 공중에 멈춘 나비', s:'birds', sn:'이른 아침 숲의 새소리', clip:'v_hand' },
+  { x:32, y:51, n:'무릎 위에 올린 다리', at:'가운데 왼쪽', d:'오른다리를 접어 왼쪽 무릎 위에 올렸고, 접힌 오른 무릎에 오른 팔꿈치를 얹었습니다.', m:'바위를 돌아 굽이쳐 흐르는 시냇물', s:'stream', sn:'굽이쳐 흐르는 시냇물 소리' },
+  { x:55, y:86, n:'연꽃을 디딘 발', at:'맨 아래 가운데', d:'왼다리는 아래로 내려, 발바닥이 작은 연꽃 받침을 딛고 있습니다.', m:'연못의 연잎 위에 떨어지는 빗방울', s:'rain', sn:'연잎에 떨어지는 빗방울 소리' }];
+/* 3장 · 거인의 동굴 */
+const ZONES = [{ id:'crown-zone', n:'머리 위 자리', x:50, y:10 }, { id:'hand-zone', n:'뺨 옆 자리', x:40, y:29 }, { id:'leg-zone', n:'무릎 위 자리', x:32, y:51 }];
+const PIECES = [
+  { id:'hand', n:'손 조각', zone:'hand-zone', line:'검지와 중지가 펴져 뺨 쪽을 향한다. 손끝과 뺨 사이에 아주 좁은 틈이 남아 있다.', hint:'그 자리가 아닙니다. 손끝이 어디를 향해 있다고 했는지 떠올려 보세요.' },
+  { id:'leg', n:'다리 조각', zone:'leg-zone', line:'한쪽 다리는 접혀 다른 무릎 위에 올라가 있고, 다른 다리는 아래로 내려 발바닥이 받침에 닿는다.', hint:'그 자리가 아닙니다. 접힌 다리가 어디에 올라가 있다고 했는지 떠올려 보세요.' },
+  { id:'crown', n:'관 조각', zone:'crown-zone', line:'머리 위에 완만한 봉우리 세 개가 나란히 솟아 있다. 금속 표면에 가는 끌 자국이 남아 있다.', hint:'그 자리가 아닙니다. 관은 머리에 쓰는 것입니다.' }];
+/* 4장 · 1방 울리는 조각: 큰 고리일수록 낮고 길게 */
+const RINGS = { robe:{ n:'옷주름 고리', x:45, y:70, f:165, d:3.2 }, leg:{ n:'다리 고리', x:32, y:51, f:220, d:2.6 }, face:{ n:'얼굴 고리', x:54, y:19, f:294, d:2.0 }, hand:{ n:'손 고리', x:40, y:29, f:392, d:1.5 }, crown:{ n:'관 고리', x:50, y:10, f:523, d:1.0 } };
+const ROUNDS1 = [{ want:'robe', cands:['hand', 'robe', 'face'], warm:.6 }, { want:'crown', cands:['leg', 'face', 'crown'], warm:1 }];
+/* 5장 · 2방 보이지 않는 깊이: 가까움 0 멀다 · 1 조금 가깝다 · 2 가깝다 · 3 바로 여기 */
+const DEPTH = { top:{ n:'위쪽 자리', x:50, y:24 }, mid:{ n:'가운데 자리', x:50, y:50 }, bottom:{ n:'아래쪽 자리', x:50, y:76 } };
+const TRACES = [[['top', 0], ['bottom', 3]], [['top', 2], ['mid', 3], ['bottom', 1]]];
+/* 점수(원래 게임의 data/score.json · 소리로 만나는 판 규칙 그대로) */
+const ENDS = { best:{ name:'최고 엔딩', title:'앞으로도 쭉' }, good:{ name:'좋음 엔딩', title:'흠까지 알아보는 사이' }, normal:{ name:'보통 엔딩', title:'다음 밤의 약속' } };
+/* 장면 영상(작품 소개 영상에서 장마다 잘라 낸 생성 영상)과 화면 해설, 배경 그림, 말하는 사람 그림 */
+const SCENES = {
+  c_giant:{ d:'어두운 동굴에서 거대한 외눈이 빛줄기를 내뿜습니다.', c:[{ s:.1, e:1.75, w:'사유', t:'외눈 거인의 눈을 피해' }, { s:1.75, e:3.4, w:'사유', t:'내 조각을 맞춰 줘.' }] },
+  c_rings:{ d:'어둠 속에 크기가 다른 청동 고리들이 매달려 있고, 고리가 울릴 때마다 빛 고리가 번집니다.', c:[{ s:1, e:4.7, w:'사유', t:'청동 전시실에서는 고리를 두드리고 손을 얹어,' }] },
+  c_depth:{ d:'빛줄기가 흘러가 사유의 몸속으로 스며듭니다.', c:[{ s:.1, e:2.5, w:'사유', t:'귀와 손으로 내 속을 읽어.' }] },
+  c_meet:{ d:'벚꽃 아래, 녹슨 청동 손과 사유의 손이 서로 다가가다 닿기 직전에 멈춥니다.', c:[{ s:.1, e:1.54, w:'사유', t:'그리고 마지막엔,' }, { s:1.54, e:2.63, w:'사유', t:'닿을 듯 멈춘' }, { s:2.63, e:4.9, w:'사유', t:'그 자리에서 나를 만나 줘.' }] },
+  c_hello:{ d:'벚꽃 아래, 사유가 돌아보며 웃습니다.', c:[{ s:.4, e:1.7, w:'사유', t:'반가워, 사유.' }] } };
+const PIC = { '유태양':'who_rival.jpg', '흙손 영감':'who_guide.jpg', '사유':'who_sayu.jpg' };
+const RATES = [['느리게', .8], ['보통', 1], ['빠르게', 1.3], ['아주 빠르게', 1.6]];
+
+/* ───────── 기본 도구 ───────── */
+const $ = id => document.getElementById(id);
+const app = $('app'), start = $('start'), live = $('live');
+let mode = 'on';   // on 음성 해설 · sr 화면 읽기 · quiet 소리 없이
+try{ const m = localStorage.getItem('sayu8-mode'); if(m === 'sr' || m === 'quiet') mode = m; }catch(e){}
+const voiceOn = () => mode === 'on', quiet = () => mode === 'quiet';
+/* 장 · 방 번호는 일, 이, 삼 … 팔로 읽는다(7장 → 칠장) */
+const HAN = ['', '일', '이', '삼', '사', '오', '육', '칠', '팔'];
+const pr = t => String(t || '').replace(/(?<![0-9])([1-8])(?=\s*(장|방)(?![0-9]))/g, (m, d) => HAN[d]);
+/* 화면에 보이는 '7장'도 화면 낭독기는 '칠장'으로 읽게: 숫자는 숨기고 한글 숫자를 낭독기 전용으로 덧붙인다 */
+const RX = /(?<![0-9])([1-8])(?=\s*(장|방)(?![0-9]))/g;
+function srNum(root){ const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode:n => n.parentNode && /^(SCRIPT|STYLE)$/.test(n.parentNode.nodeName) || n.parentNode.closest('[aria-hidden="true"], .sr') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT }), list = [];
+  while(w.nextNode()) if(RX.test(w.currentNode.nodeValue)){ RX.lastIndex = 0; list.push(w.currentNode); } RX.lastIndex = 0;
+  list.forEach(t => { const f = document.createDocumentFragment(); let last = 0; const s = t.nodeValue;
+    s.replace(RX, (m, d, _u, i) => { f.appendChild(document.createTextNode(s.slice(last, i))); const h = document.createElement('span'); h.setAttribute('aria-hidden', 'true'); h.textContent = d; const r = document.createElement('span'); r.className = 'sr'; r.textContent = HAN[d]; f.appendChild(h); f.appendChild(r); last = i + 1; return m; });
+    f.appendChild(document.createTextNode(s.slice(last))); t.parentNode.replaceChild(f, t); }); }
+const announce = t => { t = pr(t); live.textContent = ''; setTimeout(() => { live.textContent = t; }, 60); };
+const sentences = t => String(t || '').split(/(?<=[.!?])\s+/).filter(Boolean);
+let ri = 1; try{ const r = +localStorage.getItem('sayu8-rate'); if(RATES[r]) ri = r; }catch(e){}
+function cap(who, text){ $('capWho').textContent = who; const el = $('capText'); el.innerHTML = '';
+  sentences(text).forEach(x => { const s = document.createElement('span'); s.className = 'ln'; s.textContent = x + ' '; el.appendChild(s); }); srNum($('capWho')); srNum(el);
+  return el.querySelectorAll('.ln'); }
+function mark(lines, i){ if(!lines) return; lines.forEach((l, k) => l.classList.toggle('on', k === i)); if(lines[i]) try{ lines[i].scrollIntoView({ block:'nearest' }); }catch(e){} }
+
+/* 기기 음성: 문장 단위로 읽고, 일시정지 · 다시 듣기 · 빠르기 */
+const S = window.speechSynthesis; let voice = null, tok = 0, N = null, lastN = null;
+function pickVoice(){ const vs = S ? S.getVoices() : [], ko = vs.filter(v => /^ko/i.test(v.lang)); voice = ko.find(v => /sunhi|선희|yuna|유나|heami/i.test(v.name)) || ko[0] || null; }
+if(S){ pickVoice(); try{ S.addEventListener('voiceschanged', pickVoice); }catch(e){} }
+function stopSpeech(){ tok++; try{ S && S.cancel(); }catch(e){} if(AU) try{ AU.pause(); }catch(e){} N = null; paintCtl(); }
+function finish(n){ if(n !== N) return; N = null; mark(n.lines, -1); paintCtl(); if(n.then) n.then(); }
+function speak(text, lines, then, quick){
+  stopSpeech(); const n = { text, parts:sentences(pr(text)), lines, then, i:0, paused:false }; N = n; if(!quick) lastN = n; paintCtl();
+  if(!voiceOn() || !S){ announce(text); const my = ++tok; setTimeout(() => { if(my === tok) finish(n); }, quiet() ? 300 + text.length * 25 : 400 + text.length * 8); return; }
+  run(n); }
+function run(n){ const my = ++tok;
+  (function next(){ if(my !== tok || n !== N || n.paused) return; if(n.i >= n.parts.length){ finish(n); return; } mark(n.lines, n.i);
+    const u = new SpeechSynthesisUtterance(n.parts[n.i]); u.lang = 'ko-KR'; u.rate = RATES[ri][1]; if(voice) u.voice = voice;
+    let ok = false; const fin = () => { if(ok) return; ok = true; if(my !== tok) return; n.i++; setTimeout(next, 150); };
+    u.onend = fin; u.onerror = fin; setTimeout(() => { if(!ok && my === tok && !S.speaking) fin(); }, Math.max(3000, u.text.length * 300 / RATES[ri][1]));
+    try{ S.speak(u); }catch(e){ fin(); } })(); }
+/* 인물 녹음(사유 · 유태양 · 흙손 영감) */
+let AU = null;
+function picShow(who){ const w = $('whoPic'); if(!who || !PIC[who]){ w.hidden = true; return; } w.querySelector('img').src = PIC[who]; w.querySelector('span').textContent = who; w.hidden = false; }
+function clip(name, then){ const [who, text] = CLIP[name]; stopSpeech(); cap(who, text); announce(who + ': ' + text); picShow(who); const my = ++tok;
+  if(quiet()){ setTimeout(() => { if(my === tok){ picShow(null); then && then(); } }, 600 + text.length * 30); return; }
+  if(!AU) AU = new Audio(); let done = false; const end = () => { if(done || my !== tok) return; done = true; picShow(null); then && then(); };
+  AU.onended = end; AU.onerror = end; AU.src = name + '.mp3'; const p = AU.play(); if(p && p.catch) p.catch(end); }
+function paintCtl(){ const p = N && N.paused; $('pauseIcon').textContent = p ? '▶' : '❚❚'; $('pauseBtn').classList.toggle('on', !!p); $('pauseBtn').setAttribute('aria-label', p ? '해설 이어 듣기' : '해설 일시정지');
+  $('rateNow').textContent = RATES[ri][0]; $('rateBtn').setAttribute('aria-label', '말 빠르기, 지금 ' + RATES[ri][0]); }
+function notify(t){ if(!voiceOn()){ announce(t); return; } if(N) return; speak(t, null, null, true); }
+const say = (who, text, then) => speak(text, cap(who, text), then);
+
+/* 소리 */
+let AC = null;
+function ac(){ if(!AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state === 'suspended') try{ AC.resume(); }catch(e){} return AC; }
+function out(pan){ const a = ac(), p = a.createStereoPanner ? a.createStereoPanner() : null; if(p){ p.pan.value = pan || 0; p.connect(a.destination); return p; } return a.destination; }
+function tone(f, dur, vol, type, pan, when){ const a = ac(); if(!a || quiet()) return; const t = a.currentTime + (when || 0), o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(.0005, t + dur);
+  o.connect(g); g.connect(out(pan)); o.start(t); o.stop(t + dur + .05); }
+const panOf = x => Math.max(-1, Math.min(1, x / 50 - 1));
+function arrive(p){ tone(440 + (100 - p.y) * 5, .45, .15, 'sine', panOf(p.x)); tone((440 + (100 - p.y) * 5) * 1.5, .45, .12, 'sine', panOf(p.x), .09); }
+function knock(p){ [0, .16].forEach(w => tone(220 + (100 - p.y) * 3, .25, .22, 'triangle', panOf(p.x), w)); }
+function noise(dur){ const a = ac(); const b = a.createBuffer(1, a.sampleRate * dur, a.sampleRate), d = b.getChannelData(0); for(let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const s = a.createBufferSource(); s.buffer = b; return s; }
+function bell(){ tone(1318, 1.6, .12); tone(1760, 1.6, .08, 'sine', 0, .12); }
+function yes(){ tone(660, .5, .12); tone(880, .6, .1, 'sine', 0, .12); }
+function no(){ tone(220, .35, .14, 'triangle'); tone(185, .4, .12, 'triangle', 0, .15); }
+function thud(){ const a = ac(); if(!a || quiet()) return; [0, .5].forEach(w => { tone(58, .45, .5, 'sine', 0, w); const n = noise(.25), f = a.createBiquadFilter(), g = a.createGain(), t = a.currentTime + w;
+  f.type = 'lowpass'; f.frequency.value = 160; g.gain.setValueAtTime(.4, t); g.gain.exponentialRampToValueAtTime(.001, t + .25); n.connect(f); f.connect(g); g.connect(a.destination); n.start(t); }); }
+let BR = null;
+function breathOn(){ const a = ac(); if(!a || quiet() || BR) return; const n = noise(4), f = a.createBiquadFilter(), g = a.createGain(), l = a.createOscillator(), lg = a.createGain();
+  n.loop = true; f.type = 'bandpass'; f.frequency.value = 520; f.Q.value = .9; g.gain.value = .08; l.frequency.value = .3; lg.gain.value = .07; l.connect(lg); lg.connect(g.gain);
+  n.connect(f); f.connect(g); g.connect(a.destination); n.start(); l.start(); BR = { n, l, g, a }; }
+function breathOff(){ if(!BR) return; const x = BR; BR = null; try{ x.g.gain.setTargetAtTime(0, x.a.currentTime, .1); x.n.stop(x.a.currentTime + .5); x.l.stop(x.a.currentTime + .5); }catch(e){} }
+function ring(r, pan){ const a = ac(); if(!a || quiet()) return; [[1, .2], [2.76, .07], [5.4, .03]].forEach(([m, v]) => tone(r.f * m, r.d / m * 1.3, v, 'sine', pan)); }
+const TOK = { gap:[.62, .42, .26, .14], f:[480, 640, 860, 1150], echo:[.28, .2, .12, .06] };
+function tokRun(L, pan){ const a = ac(); if(!a || quiet()) return; for(let t = 0; t < 1.8; t += TOK.gap[L]){ tone(TOK.f[L], .06, .25, 'square', pan, t); tone(TOK.f[L], .06, .08, 'square', pan, t + TOK.echo[L]); } }
+function nature(kind, pan){ const a = ac(); if(!a || quiet()) return; const t = a.currentTime, D = 4.2, o2 = a.createGain();
+  o2.gain.setValueAtTime(0, t); o2.gain.linearRampToValueAtTime(1, t + .4); o2.gain.setValueAtTime(1, t + D - .8); o2.gain.linearRampToValueAtTime(0, t + D); o2.connect(out(pan * .6));
+  if(kind === 'birds'){ for(let i = 0; i < 9; i++){ const w = .2 + Math.random() * 3.4, f = 2400 + Math.random() * 1600, o = a.createOscillator(), g = a.createGain();
+      o.frequency.setValueAtTime(f, t + w); o.frequency.exponentialRampToValueAtTime(f * 1.4, t + w + .09); o.frequency.exponentialRampToValueAtTime(f * .9, t + w + .16);
+      g.gain.setValueAtTime(0, t + w); g.gain.linearRampToValueAtTime(.07, t + w + .02); g.gain.exponentialRampToValueAtTime(.0005, t + w + .18); o.connect(g); g.connect(o2); o.start(t + w); o.stop(t + w + .2); } return; }
+  if(kind === 'rain'){ for(let i = 0; i < 26; i++){ const w = .1 + Math.random() * 3.8, o = a.createOscillator(), g = a.createGain(), f = 900 + Math.random() * 1400;
+      o.frequency.setValueAtTime(f, t + w); o.frequency.exponentialRampToValueAtTime(f * .5, t + w + .05); g.gain.setValueAtTime(.09, t + w); g.gain.exponentialRampToValueAtTime(.0005, t + w + .07); o.connect(g); g.connect(o2); o.start(t + w); o.stop(t + w + .08); } }
+  const n = noise(D), f = a.createBiquadFilter(), g = a.createGain(), l = a.createOscillator(), lg = a.createGain();
+  f.type = kind === 'wind' ? 'bandpass' : kind === 'rain' ? 'highpass' : 'lowpass'; f.frequency.value = { wind:500, lake:420, stream:1300, rain:3000 }[kind] || 600; f.Q.value = kind === 'wind' ? 1.2 : .7;
+  g.gain.value = { wind:.18, lake:.16, stream:.12, rain:.04 }[kind] || .1; l.frequency.value = { wind:.25, lake:.6, stream:3.5, rain:.2 }[kind] || .5; lg.gain.value = g.gain.value * .7; l.connect(lg); lg.connect(g.gain);
+  if(kind === 'wind'){ const lf = a.createGain(); lf.gain.value = 280; l.connect(lf); lf.connect(f.frequency); }
+  n.connect(f); f.connect(g); g.connect(o2); n.start(t); l.start(t); n.stop(t + D); l.stop(t + D); }
+/* 진동: 안드로이드는 vibrate, 아이폰(iOS 18 이상)은 스위치 체크박스로 가벼운 진동 */
+const CAN_VIB = typeof navigator.vibrate === 'function';
+function iosTap(){ try{ const l = document.createElement('label'), i = document.createElement('input'); l.style.display = 'none'; i.type = 'checkbox'; i.setAttribute('switch', ''); l.appendChild(i); document.head.appendChild(l); l.click(); l.remove(); }catch(e){} }
+function buzz(p){ if(quiet()) return; if(CAN_VIB){ try{ navigator.vibrate(p); }catch(e){} return; } const n = Array.isArray(p) ? Math.ceil(p.length / 2) : 1; iosTap(); for(let k = 1; k < n; k++) setTimeout(iosTap, k * 90); }
+
+/* ───────── 점수 ───────── */
+const G = { giant:{ caught:0, wrong:0, done:false }, warm:0, room2:{ misses:0, done:false }, offer:{ erased:0, done:false }, reach:{ touches:0, done:false } };
+function score(){
+  const giant = G.giant.done ? Math.max(15, 50 - 5 * G.giant.caught - 3 * G.giant.wrong) : 15;
+  const room2 = G.room2.done ? Math.max(15, 50 - 5 * G.room2.misses) : 15;
+  const offer = G.offer.done ? (G.offer.erased ? 20 : 50) : 20;
+  const reach = G.reach.done ? Math.max(9, 30 - 10 * G.reach.touches) : 9;
+  const warm = G.warm >= .95 ? 20 : G.warm > 0 ? 10 : 6;
+  const skill = giant + room2, heart = offer + reach + warm, total = skill + heart;
+  const end = total >= 150 && G.offer.done && !G.offer.erased ? 'best' : total >= 100 ? 'good' : 'normal';
+  return { giant, room2, offer, reach, warm, skill, heart, total, end };
+}
+
+/* ───────── 화면 · 장 ───────── */
+let chN = 0, ccOn = true, flow = 0;
+const V1 = $('vid1'), VE = $('vidEnd'), sub = $('sub');
+function show(id){ ['v1', 'v2', 'v3', 'vClip', 'vEnd'].forEach(v => { $(v).hidden = v !== id; }); if(id === 'v2') fitFrame(); }
+/* 장마다 배경 그림(어둡게 깔아 글과 단추가 잘 보이게) */
+function setBg(id, img){ const v = $(id); v.style.backgroundImage = img ? 'linear-gradient(rgba(10,8,5,.66), rgba(10,8,5,.66)), url(' + img + ')' : ''; v.style.backgroundSize = 'cover'; v.style.backgroundPosition = 'center'; }
+/* 장면 영상: 먼저 무엇이 보이는지 말로 들려주고, 영상(사유의 목소리 · 자막)을 튼 뒤 이어 간다 */
+const VC = $('vidClip'); let sceneKey = null;
+function scene(key, lead, then){ const my = flow, D = SCENES[key];
+  say(CH[chN].n + ' · 장면', (lead ? lead + ' ' : '') + D.d, () => { if(my !== flow) return;
+    show('vClip'); sceneKey = key; VC.src = key + '.mp4'; VC.poster = key + '.jpg'; let done = false;
+    const end = () => { if(done || my !== flow) return; done = true; try{ VC.pause(); }catch(e){} sub.textContent = ''; setChips([]); then(); };
+    VC.onended = end; VC.onerror = () => setTimeout(end, 1500); setChips([['장면 건너뛰기', end]]); playV(VC); }); }
+function stopAll(){ flow++; stopSpeech(); picShow(null); [V1, VE, VC].forEach(v => { try{ v.pause(); }catch(e){} }); sub.textContent = ''; trailOff(); breathOff(); padStop(); setChips([]); $('card').hidden = true; $('eye').hidden = true; }
+function setChips(list){ const box = $('chips'); box.innerHTML = '';
+  list.forEach(c => { const b = document.createElement('button'); b.type = 'button'; b.textContent = c[0]; if(c[2]) b.className = 'go'; b.addEventListener('click', c[1]); box.appendChild(b); }); }
+const chips = $('chips');
+function addChip(label, fn, go){ const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if(go) b.className = 'go'; b.addEventListener('click', fn); chips.appendChild(b); }
+const nextLabel = n => '다음: ' + CH[n].n + ' ▶';
+function go(n){ stopAll(); chN = n; document.querySelectorAll('.lv').forEach(b => +b.dataset.ch === n ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current'));
+  ({ 1:ch1, 2:ch2, 3:ch3, 4:ch4, 5:ch5, 6:ch6, 7:ch7, 8:ch8 })[n](); }
+/* 한 장이 끝나면: 소리로 하는 사람은 저절로 다음 장, 화면 읽기는 다음 단추로 */
+function chapterEnd(n, extra){ const my = flow; setChips([[nextLabel(n + 1), () => go(n + 1), 1]]);
+  const t = (extra ? extra + ' ' : '') + (mode === 'sr' ? n + '장 끝. 다음 단추를 누르세요.' : n + '장 끝.');
+  say(n + '장 · 마침', t, () => { if(my === flow && mode !== 'sr') setTimeout(() => { if(my === flow) go(n + 1); }, 700); }); }
+
+/* 영상 자막: 화면 위 큰 자막 + 해설 글 칸 */
+function bindSubs(v, listOf, whoOf){ v.addEventListener('timeupdate', () => { const t = v.currentTime, list = listOf() || []; let c = null;
+  for(const q of list) if(t >= q.s - .05 && t <= q.e + .25) c = q;
+  const html = c && ccOn ? (c.w && c.w !== '해설' ? '<b>' + c.w + '</b>' : '') + c.t : '';
+  if(sub.dataset.k !== html){ sub.dataset.k = html; sub.innerHTML = html; if(c){ $('capWho').textContent = whoOf() + (c.w ? ' · ' + c.w : ''); $('capText').textContent = c.t; } } }); }
+function playV(v){ v.muted = quiet(); const p = v.play(); if(p && p.catch) p.catch(e => { if(e && e.name === 'NotAllowedError'){ v.muted = true; v.play().catch(() => {}); } }); }
+
+/* ── 1장 · 프롤로그 ── */
+function ch1(){ show('v1'); const my = flow; setChips([['영상 처음부터', () => { V1.currentTime = 0; playV(V1); }], [nextLabel(2), () => go(2), 1]]);
+  say('1장 · 프롤로그', T.p1, () => { if(my !== flow) return; V1.currentTime = 0; playV(V1); }); }
+V1.addEventListener('ended', () => { if(chN !== 1) return; sub.textContent = ''; setChips([]); chapterEnd(1); });
+
+/* ── 사진 위 손끝 탐색(2 · 3 · 4 · 5장이 함께 쓴다) ── */
+let EX = null, cur = -1, inSpot = -1, lastPtr = 0, exploring = false;
+const frame = $('frame'), hot = $('hot');
+function fitFrame(){ const box = $('stage'), aw = box.clientWidth, ah = box.clientHeight; if(!aw || !ah) return; const r = 658 / 741, w = Math.min(aw, ah * r); frame.style.width = w + 'px'; frame.style.height = (w / r) + 'px'; }
+addEventListener('resize', fitFrame); if(window.ResizeObserver) new ResizeObserver(fitFrame).observe($('stage'));
+/* cfg: { spots:[{x,y,n,label?,done?}], arrive(k), tap(k) } */
+function setEx(cfg){ EX = cfg; cur = -1; inSpot = -1; renderHot(); }
+function renderHot(){ hot.innerHTML = ''; if(!EX) return; EX.spots.forEach((p, k) => { if(p.gone) return; const b = document.createElement('button'); b.type = 'button'; b.className = 'hs' + (p.done ? ' seen' : ''); b.dataset.k = k;
+  b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-label', (HAN[k + 1] || (k + 1)) + '. ' + (p.label || p.n));
+  b.innerHTML = '<i aria-hidden="true">' + (k + 1) + '</i><span class="tip" aria-hidden="true">' + p.n + '</span>';
+  b.addEventListener('click', () => { if(Date.now() - lastPtr < 600) return; hit(k, true); }); hot.appendChild(b); }); }
+function light(k){ hot.querySelectorAll('.hs').forEach(b => b.classList.toggle('on', +b.dataset.k === k)); }
+function hit(k, down){ if(!EX) return; if(down && k === cur){ EX.tap(k); return; } cur = k; light(k); EX.arrive(k); }
+let trail = null, lastBuzz = 0;
+function fingerAt(e){ const r = frame.getBoundingClientRect(), rot = document.documentElement.classList.contains('rot');
+  const u = rot ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width, v = rot ? 1 - (e.clientX - r.left) / r.width : (e.clientY - r.top) / r.height;
+  return { x:u * 100, y:v * 100, W:frame.offsetWidth, H:frame.offsetHeight }; }
+function nearest(f){ let best = -1, bd = 1e9; (EX ? EX.spots : []).forEach((p, k) => { if(p.gone) return; const d = Math.hypot((f.x - p.x) / 100 * f.W, (f.y - p.y) / 100 * f.H); if(d < bd){ bd = d; best = k; } }); return { k:best, d:bd }; }
+function trailOn(){ const a = ac(); if(!a || trail || quiet()) return; const o = a.createOscillator(), f = a.createBiquadFilter(), g = a.createGain(), p = a.createStereoPanner ? a.createStereoPanner() : null;
+  o.type = 'triangle'; f.type = 'lowpass'; f.frequency.value = 900; g.gain.value = 0; o.connect(f); f.connect(g); if(p){ g.connect(p); p.connect(a.destination); } else g.connect(a.destination); o.start(); trail = { o, g, p, a }; }
+function trailSet(f, near){ if(!trail) return; const t = trail.a.currentTime; trail.o.frequency.setTargetAtTime(180 + (100 - Math.max(0, Math.min(100, f.y))) * 4, t, .03);
+  if(trail.p) trail.p.pan.setTargetAtTime(panOf(f.x), t, .03); trail.g.gain.setTargetAtTime(.02 + near * .07, t, .05); }
+function trailOff(){ if(!trail) return; const x = trail; trail = null; try{ x.g.gain.setTargetAtTime(0, x.a.currentTime, .05); x.o.stop(x.a.currentTime + .3); }catch(e){} }
+function follow(e, down){ const f = fingerAt(e), n = nearest(f); if(n.k < 0) return; const R = Math.max(30, f.W * .08), near = Math.max(0, Math.min(1, 1 - (n.d - R) / (R * 2.5)));
+  trailSet(f, near);
+  if(n.d > R && near > 0){ const gap = 420 - near * 300; if(Date.now() - lastBuzz > gap){ lastBuzz = Date.now(); buzz(8); } }
+  if(n.d <= R){ if(down){ inSpot = n.k; hit(n.k, true); } else if(inSpot !== n.k){ inSpot = n.k; if(n.k !== cur) hit(n.k, false); } }
+  else inSpot = -1; }
+hot.addEventListener('pointerdown', e => { ac(); exploring = true; lastPtr = Date.now(); try{ hot.setPointerCapture(e.pointerId); }catch(x){} trailOn(); follow(e, true); });
+hot.addEventListener('pointermove', e => { if(!exploring) return; lastPtr = Date.now(); follow(e, false); });
+const endF = () => { if(!exploring) return; exploring = false; lastPtr = Date.now(); inSpot = -1; trailOff(); };
+hot.addEventListener('pointerup', endF); hot.addEventListener('pointercancel', endF); hot.addEventListener('lostpointercapture', endF);
+function markDone(k){ EX.spots[k].done = true; const b = hot.querySelector('.hs[data-k="' + k + '"]'); if(b) b.classList.add('seen'); }
+
+/* ── 2장 · 사유의 모습: 이름과 모습 → 자연에 빗댄 모습 → 자연의 소리 ── */
+function ch2(){ show('v2'); const lv = {}; let all = false;
+  setChips([['다음 지점 ▶', () => { lastPtr = 0; hit(cur < 0 ? 0 : (cur + 1) % FORM.length, false); }], [nextLabel(3), () => go(3), 1]]);
+  const layer = (k, L) => { const p = FORM[k]; $('card').hidden = true; lv[k] = L; markDone(k);
+    if(L === 0){ arrive(p); buzz([40, 30, 40]); say('2장 · ' + p.n, p.n + '. ' + p.d, check); return; }
+    if(L === 1){ knock(p); buzz([20, 60, 20]); const t = '자연에 빗대면, ' + p.m + '입니다.'; setTimeout(() => say('2장 · ' + p.n + ' · 비유', t, check), 380); return; }
+    nature(p.s, panOf(p.x)); buzz([15, 120, 15, 120, 15]); $('card').innerHTML = '<b>자연의 소리</b>' + p.sn; $('card').hidden = false;
+    say('2장 · ' + p.n + ' · 자연의 소리', p.sn + '입니다.', () => { if(p.clip) setTimeout(() => { if(chN === 2 && cur === k) clip(p.clip, check); }, 2600); else check(); }); };
+  const check = () => { if(!all && FORM.every(p => p.done)){ all = true; setTimeout(() => { if(chN === 2 && !N) say('2장 · 다 만났습니다', T.p2all); }, 600); } };
+  FORM.forEach(p => { p.done = false; });
+  setEx({ spots:FORM.map(p => Object.assign(p, { label:p.n + ', ' + p.at })), arrive:k => layer(k, 0), tap:k => layer(k, ((lv[k] || 0) + 1) % 3) });
+  say('2장 · 사유의 모습', T.p2); }
+
+/* ── 3장 · 외눈 거인의 동굴: 차례제 잠입(거인은 기다리기를 누를 때만 움직인다) ── */
+const GI = {};
+function eyeShow(){ const e = $('eye'); e.hidden = false; e.textContent = GI.eye === 'look' ? '👁 거인이 보고 있다' : '거인이 돌아서 있다' + (GI.piece ? ' · 든 조각: ' + GI.piece.n : ''); e.className = GI.eye; }
+function ch3(){ scene('c_giant', T.g0, ch3b); }
+function ch3b(){ show('v2'); setBg('v2', 'b_cave.jpg'); const my = flow; Object.assign(GI, { idx:0, piece:null, eye:'away', practice:true, caughtNow:false, tried:[], placed:{} }); G.giant = { caught:0, wrong:0, done:false };
+  setEx({ spots:ZONES.map(z => ({ x:z.x, y:z.y, n:z.n })), arrive:gArrive, tap:gTap }); eyeShow();
+  setChips([['숨죽이고 기다리기', gWait, 1], ['게임하는 법 다시 듣기', () => say('3장 · 게임하는 법', T.gHow)]]);
+  clip('r_cave', () => { if(my !== flow) return; say('3장 · 게임하는 법', T.gHow, () => { if(my === flow) gLook(T.gPractice); }); }); }
+function gLook(text){ GI.eye = 'look'; GI.caughtNow = false; thud(); buzz([200, 300, 200]); setTimeout(() => { if(GI.eye === 'look') breathOn(); }, 900); eyeShow(); say('3장 · 거인이 본다', text); }
+function gWait(){ if(chN !== 3) return; ac();
+  if(GI.eye === 'away'){ say('3장', GI.piece ? T.gStillAway : T.gNoPiece); return; }
+  breathOff(); bell(); buzz(30); GI.eye = 'away'; const first = GI.practice; GI.practice = false;
+  if(!GI.piece && GI.idx < PIECES.length){ GI.piece = PIECES[GI.idx]; GI.tried = []; eyeShow();
+    say('3장 · ' + GI.piece.n, (first ? T.gAwayFirst : T.gAway) + ' ' + GI.piece.n + '을 받았습니다. ' + GI.piece.line); return; }
+  eyeShow(); say('3장', T.gAway); }
+function gArrive(k){ const z = ZONES[k]; tone(330 + (100 - z.y) * 6, .3, .14, 'sine', panOf(z.x)); buzz(25);
+  const done = Object.values(GI.placed).includes(z.id); say('3장 · ' + z.n, z.n + (done ? ', 이미 조각을 붙인 자리입니다.' : '.'), null); }
+function gTap(k){ const z = ZONES[k];
+  if(!GI.piece){ say('3장', GI.eye === 'look' ? '거인이 보고 있습니다. 숨죽이고 기다리기를 누르세요.' : T.gNoPiece); return; }
+  if(GI.eye === 'look'){ thud(); no(); buzz([150, 80, 150]);
+    if(GI.practice){ say('3장 · 연습', T.gCaughtPractice); return; }
+    if(!GI.caughtNow){ GI.caughtNow = true; G.giant.caught++; } say('3장 · 들켰다', T.gCaught); return; }
+  if(Object.values(GI.placed).includes(z.id)){ say('3장', '이미 조각을 붙인 자리입니다. 다른 자리를 찾아보세요.'); return; }
+  if(z.id !== GI.piece.zone){ no(); buzz([60, 60, 60]); if(!GI.tried.includes(z.id)){ GI.tried.push(z.id); G.giant.wrong++; }
+    const hint = GI.tried.length >= 2 ? '흙손 영감이 속삭입니다. ' + ZONES.find(x => x.id === GI.piece.zone).n + '다.' : GI.piece.hint; say('3장 · 자리 틀림', hint); return; }
+  knock(z); yes(); buzz([40, 40, 80]); GI.placed[GI.piece.id] = z.id; markDone(k); GI.idx++; GI.piece = null; const left = PIECES.length - GI.idx;
+  if(left > 0){ GI.eye = 'look'; GI.caughtNow = false; eyeShow(); setTimeout(() => { if(chN === 3 && GI.eye === 'look'){ thud(); buzz([200, 300, 200]); setTimeout(() => { if(GI.eye === 'look') breathOn(); }, 900); } }, 700);
+    say('3장 · 붙었다', '붙었다! 남은 조각 ' + left + '개. ' + T.gAlert); return; }
+  G.giant.done = true; eyeShow(); gWho(); }
+function gWho(){ const my = flow; show('v3'); setBg('v3', 'b_cave.jpg'); $('v3').innerHTML = '<p class="who3">거인이 이름을 묻는다</p><div class="pick one"><button type="button" class="keep" id="nobody">아무도 아니다<small>대답하기</small></button></div>';
+  setChips([]); thud();
+  $('nobody').onclick = () => { stopSpeech(); buzz(40); setChips([[nextLabel(4), () => go(4), 1]]); $('v3').innerHTML = '<p class="who3">바위 틈으로 빠져나왔다</p>'; say('3장 · 빠져나왔다', '“아무도 아니다.” ' + T.gOut, () => { if(my === flow) clip('s_thanks', () => { if(my === flow) chapterEnd(3); }); }); };
+  say('3장 · 이름을 묻는다', T.gWho, () => { try{ $('nobody').focus({ preventScroll:true }); }catch(e){} }); }
+
+/* ── 4장 · 1방 울리는 조각: 물음 둘, 고리 셋 가운데 가장 큰 · 가장 작은 고리 ── */
+function ch4(){ G.warm = 0; scene('c_rings', T.r1, () => { const my = flow; show('v2'); setBg('v2', 'b_rings.jpg'); setEx({ spots:[], arrive(){}, tap(){} }); clip('g_rings', () => { if(my === flow) r1Round(0); }); }); }
+function r1Round(k, lead){ const R = ROUNDS1[k]; let miss = 0;
+  setEx({ spots:R.cands.map(id => ({ id, x:RINGS[id].x, y:RINGS[id].y, n:RINGS[id].n })),
+    arrive:i => { const id = EX.spots[i].id; ring(RINGS[id], panOf(RINGS[id].x)); buzz(20); say('4장 · ' + RINGS[id].n, RINGS[id].n + '.', null); },
+    tap:i => { const id = EX.spots[i].id;
+      if(id !== R.want){ miss++; no(); buzz([60, 60, 60]); say('4장 · 아니에요', miss >= 2 ? T.r1wrong2[k] : T.r1wrong[k]); return; }
+      markDone(i); G.warm = Math.max(G.warm, R.warm); yes(); tone(392, 1.4, .08, 'sine', 0, .2); buzz([30, 60, 30]);
+      const ok = T.r1right[k];
+      if(k === 0){ r1Round(1, ok); return; }
+      setEx({ spots:[], arrive(){}, tap(){} }); setChips([[nextLabel(5), () => go(5), 1]]);
+      say('4장 · 맞았어요', ok, () => { if(chN === 4) clip('g_ringsend', () => { if(chN === 4) chapterEnd(4); }); }); } });
+  setChips([['물음 다시 듣기', () => say('4장 · 물음', T.r1q[k])], ['세 고리 차례로 듣기', () => { R.cands.forEach((id, j) => setTimeout(() => ring(RINGS[id], panOf(RINGS[id].x)), j * 1400)); }]]);
+  say('4장 · 물음 ' + (k + 1), (lead ? lead + ' ' : '') + T.r1q[k]); }
+
+/* ── 5장 · 2방 보이지 않는 깊이: 비교해 듣기, 가장 빠르고 높은 똑 소리를 판다 ── */
+function ch5(){ G.room2 = { misses:0, done:false }; scene('c_depth', T.r2, () => { const my = flow; show('v2'); setBg('v2', 'b_light.jpg'); setEx({ spots:[], arrive(){}, tap(){} });
+  setChips([['먼 소리 들어 보기', () => tokRun(0, 0)], ['가까운 소리 들어 보기', () => tokRun(3, 0)], ['게임하는 법 다시 듣기', () => say('5장 · 게임하는 법', T.r2How)]]);
+  clip('g_eyes', () => { if(my === flow) say('5장 · 게임하는 법', T.r2How, () => { if(my === flow) r2Trace(0); }); }); }); }
+function r2Trace(t, lead){ const list = TRACES[t].map(([id, L]) => ({ id, L, x:DEPTH[id].x, y:DEPTH[id].y, n:DEPTH[id].n }));
+  setEx({ spots:list,
+    arrive:i => { const s = EX.spots[i]; buzz(20); speak(s.n + '.', cap('5장 · ' + s.n, s.n + '.'), () => tokRun(s.L, panOf(s.x)), true); },
+    tap:i => { const s = EX.spots[i]; knock(s);
+      if(s.L === 3){ markDone(i); yes(); buzz([40, 40, 80]);
+        const ok = s.n + '를 팝니다. ' + T.r2found[t];
+        if(t === 0){ r2Trace(1, ok); return; }
+        G.room2.done = true; setEx({ spots:[], arrive(){}, tap(){} }); setChips([[nextLabel(6), () => go(6), 1]]);
+        say('5장 · 찾았다', ok + ' ' + T.r2end, () => { if(chN === 5) clip('s_found', () => { if(chN === 5) chapterEnd(5); }); }); return; }
+      G.room2.misses++; no(); buzz([60, 60, 60]); s.gone = true; cur = -1; renderHot(); const left = EX.spots.filter(x => !x.gone);
+      say('5장 · 여기가 아니에요', '여기가 아닙니다. ' + (left.length === 1 ? '남은 자리는 ' + left[0].n + '입니다.' : '남은 ' + left.length + '곳을 다시 들어 보세요.')); } });
+  say('5장 · 흔적 ' + (t + 1), (lead ? lead + ' ' : '') + T.r2task[t]); }
+
+/* ── 6장 · 마지막 제안 ── */
+const v3 = $('v3');
+const TAE = '<img class="portrait" src="who_rival.jpg" alt="" aria-hidden="true">';
+function ch6(){ show('v3'); setBg('v3', 'b_hands.jpg'); const my = flow; G.offer = { erased:0, done:false }; v3.innerHTML = TAE + '<p class="who3">마지막 제안 · 유태양이 길을 막는다</p>';
+  say('6장 · 마지막 제안', T.o0, () => { if(my === flow) clip('v_offer', () => { if(my === flow) ask(); }); }); }
+function ask(){ const my = flow;
+  v3.innerHTML = TAE + '<p class="who3">흠을 지울까, 이대로 갈까?</p><div class="pick"><button type="button" class="keep" id="keepBtn">이대로 간다<small>흠과 흔적을 지킨다</small></button><button type="button" id="eraseBtn">지운다<small>흠 없는 몸이 된다</small></button></div>';
+  $('keepBtn').onclick = () => { stopSpeech(); buzz(40); G.offer.done = true; setChips([[nextLabel(7), () => go(7), 1]]); v3.innerHTML = '<p class="who3">유태양이 돌아선다</p>'; clip('v_rivalexit', () => { if(my === flow) chapterEnd(6, T.oKeep); }); };
+  $('eraseBtn').onclick = () => { buzz(40); G.offer.erased++; no(); v3.innerHTML = '<p class="who3">마지막 제안 · 지운 뒤</p><div class="pick one"><button type="button" id="backOffer">돌아간다<small>제안 앞으로 돌아가 다시 고른다</small></button></div>';
+    $('backOffer').onclick = () => { stopSpeech(); ask(); }; say('6장 · 지운 뒤', T.oErased, () => { try{ $('backOffer').focus({ preventScroll:true }); }catch(e){} }); };
+  say('6장 · 고르기', T.oAsk, () => { try{ $('keepBtn').focus({ preventScroll:true }); }catch(e){} }); }
+
+/* ── 7장 · 사유 만남: 닿을 듯 멈추기 세 번, 갈수록 틈이 좁아진다 ── */
+const GAPS = [[.70, .92], [.74, .91], [.78, .90]], STEP = 1 / 55;
+const hold = { on:false, p:0, t:null, done:false, osc:null, round:0, told:false };
+function ch7(){ G.reach = { touches:0, done:false }; hold.round = 0;
+  scene('c_meet', '7장, 사유 만남.', () => { const my = flow; show('v3'); setBg('v3', 'b_hands.jpg'); v3.innerHTML = '<img class="portrait" src="who_sayu.jpg" alt="" aria-hidden="true"><p class="who3">유리장 앞</p>';
+    say('7장 · 사유 만남', T.m0open, () => { if(my === flow) clip('v_meetfirst', () => { if(my === flow) meetEnd(); }); }); }); }
+/* 손 떼기 게임은 뺐다(2026-11-24): 만남은 듣기만 한다. 점수는 닿지 않고 머문 것으로 친다 */
+function meetEnd(){ const my = flow; G.reach = { touches:0, done:true }; buzz([30, 60, 30]); tone(660, 1.2, .12); tone(990, 1.4, .08, 'sine', 0, .15);
+  v3.innerHTML = '<img class="portrait" src="who_sayu.jpg" alt="" aria-hidden="true"><p class="who3">닿을 듯 멈춘 자리</p>'; setChips([[nextLabel(8), () => go(8), 1]]);
+  say('7장 · 닿을 듯 멈춘 자리', T.m1, () => { if(my === flow) clip('v_gap', () => { if(my === flow) chapterEnd(7); }); }); }
+function reach(first){ const n = hold.round + 1;
+  v3.innerHTML = '<p class="who3">손 내밀기 · 세 번 중 ' + ['첫 번째', '두 번째', '세 번째'][hold.round] + '</p><button type="button" class="pad" id="pad" aria-label="손 내밀기, 세 번 중 ' + n + '. 누르고 있으면 손이 다가갑니다. 떨리는 소리가 나면 떼세요. 화면 읽기를 쓰면 한 번 눌러 다가가고, 떨리는 소리가 나면 다시 누르세요.">손 내밀기<small>누르고 있으면 다가가요 · 떨리면 떼세요</small><span class="bar" aria-hidden="true"></span></button>';
+  hold.p = 0; hold.done = false; const pad = $('pad');
+  pad.addEventListener('pointerdown', e => { if(hold.done) return; e.preventDefault(); try{ pad.setPointerCapture(e.pointerId); }catch(x){} holdStart(); });
+  pad.addEventListener('pointerup', () => holdEnd()); pad.addEventListener('pointercancel', () => holdEnd());
+  pad.addEventListener('click', e => { if(e.detail) return; hold.on ? holdEnd() : holdStart(); });   // 키보드 · 화면 읽기: 눌러서 시작, 다시 눌러서 멈춤
+  pad.addEventListener('keydown', e => { if(e.key === ' ' && !e.repeat && !hold.on){ e.preventDefault(); holdStart(); } });
+  pad.addEventListener('keyup', e => { if(e.key === ' '){ e.preventDefault(); holdEnd(); } });
+  setChips([['게임하는 법 다시 듣기', () => say('7장 · 게임하는 법', T.mHow)], ['떨리는 소리 들어 보기', previewTremble]]);
+  if(first) say('7장 · 손 내밀기', T.mHow, () => { try{ pad.focus({ preventScroll:true }); }catch(e){} }); else try{ pad.focus({ preventScroll:true }); }catch(e){} }
+function previewTremble(){ if(hold.on) return; stopSpeech(); const a = ac(); buzz([12, 40, 12, 40, 12, 40, 12, 40, 12]);
+  if(!a || quiet()){ announce('떨리는 소리: 부르르 떨리는 높은 소리입니다. 이 소리가 나면 손가락을 떼세요.'); return; }
+  const o = a.createOscillator(), g = a.createGain(), l = a.createOscillator(), lg = a.createGain(), t = a.currentTime;
+  o.type = 'sine'; o.frequency.value = 600; l.frequency.value = 9; lg.gain.value = 28; l.connect(lg); lg.connect(o.frequency); o.connect(g); g.connect(a.destination);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.11, t + .1); g.gain.setValueAtTime(.11, t + 1.4); g.gain.exponentialRampToValueAtTime(.0001, t + 1.6);
+  o.start(t); l.start(t); o.stop(t + 1.7); l.stop(t + 1.7);
+  setTimeout(() => say('7장 · 떨리는 소리', '이 소리가 나면 손가락을 떼세요.'), 1700); }
+function padStop(){ clearInterval(hold.t); hold.on = false; oscOff(); }
+function holdStart(){ if(hold.on || hold.done) return; stopSpeech(); const a = ac(); hold.on = true; hold.told = false;
+  if(a && !quiet()){ const o = a.createOscillator(), g = a.createGain(), l = a.createOscillator(), lg = a.createGain(); o.type = 'sine'; g.gain.value = .0001; l.frequency.value = 9; lg.gain.value = 0; l.connect(lg); lg.connect(o.frequency); o.connect(g); g.connect(a.destination); o.start(); l.start(); hold.osc = { o, g, l, lg, a }; }
+  clearInterval(hold.t); hold.t = setInterval(tickHold, 100); }
+function tickHold(){ const pad = $('pad'); if(!pad){ padStop(); return; } const [g0, g1] = GAPS[hold.round]; hold.p = Math.min(1, hold.p + STEP); const p = hold.p, inGap = p >= g0 && p < g1;
+  pad.querySelector('.bar').style.width = (p * 100) + '%'; pad.classList.toggle('gap', inGap);
+  if(hold.osc){ const t = hold.osc.a.currentTime; hold.osc.o.frequency.setTargetAtTime(180 + p * 520, t, .05); hold.osc.g.gain.setTargetAtTime(.04 + p * .08, t, .05); hold.osc.lg.gain.setTargetAtTime(inGap ? 28 : 0, t, .03); }
+  if(inGap){ if(!hold.told){ hold.told = true; announce('떨린다. 지금 떼세요.'); } buzz([12, 40, 12]); } else if(Math.random() < p * .5) buzz(6);
+  if(p >= g1) touched(); }
+function oscOff(){ if(hold.osc){ const x = hold.osc; hold.osc = null; try{ x.g.gain.setTargetAtTime(0, x.a.currentTime, .04); x.o.stop(x.a.currentTime + .2); x.l.stop(x.a.currentTime + .2); }catch(e){} } }
+function touched(){ padStop(); const pad = $('pad'); pad.classList.remove('gap'); pad.classList.add('touch'); G.reach.touches++;
+  const a = ac(); if(a && !quiet()){ const n = noise(.35), f = a.createBiquadFilter(), g = a.createGain(); f.type = 'lowpass'; f.frequency.value = 700; g.gain.setValueAtTime(.35, a.currentTime); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + .35); n.connect(f); f.connect(g); g.connect(a.destination); n.start(); }
+  buzz([120, 40, 120]); hold.p = 0; setTimeout(() => { if(pad){ pad.classList.remove('touch'); pad.querySelector('.bar').style.width = '0'; } }, 700); say('7장 · 닿았어요', T.mTouch); }
+function holdEnd(){ if(!hold.on) return; padStop(); const [g0, g1] = GAPS[hold.round], p = hold.p, pad = $('pad'); pad.classList.remove('gap');
+  if(p >= g0 && p < g1){ hold.done = true; met(); return; }
+  hold.p = 0; pad.querySelector('.bar').style.width = '0'; say('7장 · 아직 멀어요', T.mEarly); }
+function met(){ const my = flow, r = hold.round; buzz([30, 60, 30, 60, 30]); tone(660, 1.2, .12); tone(990, 1.4, .08, 'sine', 0, .15);
+  if(r < 2){ hold.round = r + 1; reach(false); say('7장 · 닿을 듯 멈춤', T.mStop[r], () => { if(my === flow && r === 0 && !hold.on) clip('s_tremble'); }); return; }
+  G.reach.done = true; v3.innerHTML = '<p class="who3">닿을 듯 멈춘 자리</p>'; setChips([[nextLabel(8), () => go(8), 1]]);
+  say('7장 · 닿을 듯 멈춤', T.mStop[r], () => { if(my === flow) clip('v_gap', () => { if(my === flow) chapterEnd(7); }); }); }
+
+/* ── 8장 · 점수와 엔딩 ── */
+let endKind = 'best';
+function ch8(){ scene('c_hello', '8장, 점수와 엔딩.', ch8b); }
+function ch8b(){ show('v3'); setBg('v3', 'b_smile.jpg'); const my = flow, s = score(); endKind = s.end; const E = ENDS[s.end];
+  const rows = [['외눈 거인의 동굴', s.giant, 50, G.giant.done ? '들킴 ' + G.giant.caught + '번 · 자리 틀림 ' + G.giant.wrong + '번' : '건너뛰어 기본 점수'],
+    ['청동 전시실 2방', s.room2, 50, G.room2.done ? '헛파기 ' + G.room2.misses + '번' : '건너뛰어 기본 점수'],
+    ['유태양의 제안', s.offer, 50, G.offer.done ? (G.offer.erased ? '흠을 ' + G.offer.erased + '번 지웠다가 돌아옴' : '처음부터 거절함') : '건너뛰어 기본 점수'],
+    ['닿을 듯 멈춘 만남', s.reach, 30, G.reach.done ? '닿지 않고 머묾' : '건너뛰어 기본 점수'],
+    ['청동 데우기(1방)', s.warm, 20, G.warm >= .95 ? '끝까지 데움' : G.warm > 0 ? '반쯤 데움' : '데우지 않음']];
+  v3.innerHTML = '<div class="score"><p class="big">합계 <b>' + s.total + '</b> / 200점</p><p>솜씨 ' + s.skill + ' / 100 · 마음 ' + s.heart + ' / 100</p><ul>' +
+    rows.map(r => '<li><span>' + r[0] + '</span><b>' + r[1] + ' / ' + r[2] + '</b><small>' + r[3] + '</small></li>').join('') + '</ul><p class="end">이번 엔딩: <b>' + E.name + ' · ' + E.title + '</b></p></div>';
+  const next = s.end === 'best' ? '' : s.end === 'good' ? '최고 엔딩은 150점 이상, 제안을 처음부터 거절하기입니다.' : '좋음 엔딩은 100점 이상입니다.';
+  const t = '합계 200점 중 ' + s.total + '점. ' + E.name + ', ' + E.title + '입니다. ' + next;
+  setChips([['엔딩 보기 ▶', endPlay, 1], ['점수 자세히 듣기', () => say('8장 · 점수 자세히', rows.map(r => r[0] + ', ' + r[2] + '점 중 ' + r[1] + '점, ' + r[3] + '.').join(' '))]]);
+  say('8장 · 점수 확인', t, () => { if(my === flow && mode !== 'sr') setTimeout(() => { if(my === flow) endPlay(); }, 800); }); }
+function endPlay(){ stopSpeech(); setChips([]); show('vEnd'); VE.src = 'ending-' + endKind + '.mp4'; VE.poster = 'p_' + endKind + '.jpg'; VE.setAttribute('aria-label', ENDS[endKind].name + ' 영상'); VE.currentTime = 0; playV(VE); }
+VE.addEventListener('ended', () => { if(chN !== 8) return; sub.textContent = '';
+  setChips([['점수 다시 보기', () => { stopAll(); ch8b(); }], ['작품 소개', () => openDlg('about'), 1], ['처음부터 새로', () => { resetAll(); go(1); }], ['표지로', backToStart]]);
+  say('엔딩 · ' + ENDS[endKind].name, '해가 떴습니다. 함께해 줘서 고마워요.'); });
+function resetAll(){ G.giant = { caught:0, wrong:0, done:false }; G.warm = 0; G.room2 = { misses:0, done:false }; G.offer = { erased:0, done:false }; G.reach = { touches:0, done:false }; }
+
+/* ───────── 단추 ───────── */
+const chBox = document.querySelector('.chapters'), chList = $('chapList');
+for(let n = 1; n <= 8; n++){
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'lv'; b.dataset.ch = n; b.setAttribute('aria-label', HAN[n] + '장 ' + CH[n].n + ', ' + CH[n].s);
+  b.innerHTML = '<b aria-hidden="true">' + n + '</b><span>' + CH[n].n + '<small>' + CH[n].s + '</small></span>'; b.addEventListener('click', () => { ac(); go(n); }); chBox.appendChild(b);
+  const c = document.createElement('button'); c.type = 'button'; c.innerHTML = '<span>' + n + '</span> ' + CH[n].n; c.setAttribute('aria-label', HAN[n] + '장 ' + CH[n].n + ', ' + CH[n].s);
+  c.addEventListener('click', () => { closeDlg(); if(start.hidden) go(n); else begin(mode, n); }); chList.appendChild(c); }
+$('pauseBtn').addEventListener('click', () => { const v = !$('v1').hidden ? V1 : !$('vEnd').hidden ? VE : null;
+  if(N && !N.paused){ N.paused = true; tok++; try{ S.cancel(); }catch(e){} mark(N.lines, N.i); paintCtl(); return; }
+  if(N && N.paused){ N.paused = false; paintCtl(); if(voiceOn()) run(N); else finish(N); return; }
+  if(v && !v.paused){ v.pause(); notify('영상을 멈췄습니다.'); return; } if(v && v.paused && v.currentTime > 0 && !v.ended){ playV(v); return; }
+  notify('지금 나오는 해설이 없습니다.'); });
+$('againBtn').addEventListener('click', () => { const n = N || lastN; if(!n){ notify('다시 들을 해설이 아직 없습니다.'); return; } speak(n.text, n.lines && n.lines[0] && n.lines[0].isConnected ? n.lines : null, null); });
+$('rateBtn').addEventListener('click', () => { ri = (ri + 1) % RATES.length; try{ localStorage.setItem('sayu8-rate', ri); }catch(e){} paintCtl(); notify('말 빠르기, ' + RATES[ri][0] + '.'); });
+bindSubs(V1, () => CUES.intro, () => '1장 · 프롤로그'); bindSubs(VC, () => sceneKey ? SCENES[sceneKey].c : [], () => CH[chN].n + ' · 장면'); bindSubs(VE, () => CUES[endKind], () => '엔딩 · ' + ENDS[endKind].name);
+
+/* 표지 ↔ 본 화면 */
+function begin(m, to){ mode = m; try{ localStorage.setItem('sayu8-mode', m); }catch(e){} ac(); paintSet();
+  try{ window.__fit && window.__fit(); }catch(e){} start.hidden = true; app.inert = false; fitFrame();
+  if(S && voiceOn()){ try{ const u = new SpeechSynthesisUtterance(' '); u.volume = 0; S.speak(u); }catch(e){} }   // 누른 순간에 기기 음성을 깨운다(아이폰)
+  try{ $('appTitle').focus({ preventScroll:true }); }catch(e){}
+  if(to){ go(to); return; }
+  if(m === 'sr'){ announce('화면 읽기 모드로 시작했습니다. 메뉴에서 여덟 장 가운데 하나를 고를 수 있습니다.'); go(1); return; }
+  speak(WELCOME, cap('반가워, 사유', WELCOME), () => go(1)); }
+function backToStart(){ stopAll(); chN = 0; document.querySelectorAll('.lv').forEach(b => b.removeAttribute('aria-current')); show(''); start.hidden = false; app.inert = true;
+  setTimeout(() => { try{ $('goVoice').focus({ preventScroll:true }); }catch(e){} }, 30); notify('표지입니다. 시작하기, 화면 읽기 사용, 소리 없이 보기 가운데 고르세요.'); }
+$('goVoice').addEventListener('click', () => { resetAll(); begin('on'); });
+$('goSR').addEventListener('click', () => { resetAll(); begin('sr'); });
+$('goQuiet').addEventListener('click', () => { resetAll(); begin('quiet'); });
+start.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => begin(mode, +b.dataset.go)));
+$('backBtn').addEventListener('click', backToStart);
+
+/* 창 열기 · 닫기 */
+let opener = null;
+function openDlg(id){ opener = document.activeElement; stopAll(); const d = $(id); d.hidden = false; app.inert = true; start.inert = true;
+  setTimeout(() => { try{ d.querySelector('h2').focus(); }catch(e){} }, 30);
+  if(id === 'about') speak(ABOUT_SAY, null, null, true);
+  if(id === 'set') notify('설정과 사용법 창입니다.');
+  if(id === 'ov') notify('소개 영상 창입니다. 소개 영상 재생 단추를 누르세요.');
+  if(id === 'chap') notify('장 고르기 창입니다. 여덟 장 가운데 하나를 고르세요.'); }
+function closeDlg(){ document.querySelectorAll('.dlg').forEach(d => { d.hidden = true; }); stopSpeech(); try{ $('ovVid').pause(); }catch(e){}
+  start.inert = false; app.inert = !start.hidden; if(opener && opener.focus) try{ opener.focus(); }catch(e){} }
+document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { ac(); openDlg(b.dataset.open); }));
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closeDlg));
+document.querySelectorAll('.dlg').forEach(d => d.addEventListener('click', e => { if(e.target === d) closeDlg(); }));
+document.addEventListener('keydown', e => { if(e.key === 'Escape'){ if(document.querySelector('.dlg:not([hidden])')) closeDlg(); else if(start.hidden) backToStart(); } });
+$('aboutSay').addEventListener('click', () => speak(ABOUT_SAY, null, null, true));
+const OV = $('ovVid'), ovSub = $('ovSub');
+$('ovPlay').addEventListener('click', () => { stopSpeech(); if(OV.paused){ playV(OV); $('ovPlay').textContent = '❚❚ 잠시 멈춤'; } else { OV.pause(); $('ovPlay').textContent = '▶ 소개 영상 재생'; } });
+OV.addEventListener('ended', () => { $('ovPlay').textContent = '▶ 소개 영상 재생'; });
+OV.addEventListener('timeupdate', () => { const t = OV.currentTime; let c = null; for(const q of CUES.overview) if(t >= q.s - .05 && t <= q.e + .25) c = q; ovSub.textContent = c && ccOn ? (c.w && c.w !== '해설' ? c.w + ': ' : '') + c.t : ''; });
+
+/* 설정 */
+const FS = [['보통', 1.2], ['크게', 1.45], ['아주 크게', 1.75]]; let fsi = 0, hcOn = document.documentElement.classList.contains('hc');
+try{ fsi = +(localStorage.getItem('sayu8-fs') || 0); if(!FS[fsi]) fsi = 0; }catch(e){}
+function paintSet(){ const d = document.documentElement; d.style.setProperty('--fs', FS[fsi][1]); d.classList.toggle('hc', hcOn);
+  $('fsNow').textContent = ['가', '가+', '가++'][fsi]; $('hcNow').textContent = hcOn ? '켜짐' : '꺼짐'; $('hcBtn').setAttribute('aria-pressed', hcOn);
+  $('ccNow').textContent = ccOn ? '켜짐' : '꺼짐'; $('ccBtn').setAttribute('aria-pressed', ccOn);
+  $('voiceNow').textContent = voiceOn() ? '켜짐' : '꺼짐'; $('voiceBtn').setAttribute('aria-pressed', voiceOn()); fitFrame(); }
+$('helpText').textContent = HELP;
+$('helpSay').addEventListener('click', () => speak(HELP, null, null, true));
+$('fsBtn').addEventListener('click', () => { fsi = (fsi + 1) % 3; try{ localStorage.setItem('sayu8-fs', fsi); }catch(e){} paintSet(); notify('글자 크기, ' + FS[fsi][0] + '.'); });
+$('hcBtn').addEventListener('click', () => { hcOn = !hcOn; try{ localStorage.setItem('sayu8-hc', hcOn ? '1' : '0'); }catch(e){} paintSet(); notify(hcOn ? '고대비를 켰습니다.' : '고대비를 껐습니다.'); });
+$('ccBtn').addEventListener('click', () => { ccOn = !ccOn; sub.textContent = ''; paintSet(); notify(ccOn ? '자막을 켰습니다.' : '자막을 껐습니다.'); });
+$('voiceBtn').addEventListener('click', () => { mode = voiceOn() ? 'sr' : 'on'; try{ localStorage.setItem('sayu8-mode', mode); }catch(e){} stopSpeech(); paintSet(); if(voiceOn()) speak('앱 음성을 켰습니다.', null, null, true); else announce('앱 음성을 껐습니다. 화면 읽기가 해설 글을 읽어 줍니다.'); });
+$('vibBtn').addEventListener('click', () => { const m = $('vibMsg'); if(!CAN_VIB){ iosTap(); m.textContent = '이 브라우저는 진동을 지원하지 않습니다. 아이폰은 iOS 18 이상 사파리에서 가벼운 진동만 납니다.'; return; }
+  let ok = false; try{ ok = navigator.vibrate([200, 120, 200]); }catch(e){} m.textContent = ok ? '진동을 두 번 보냈습니다. 느껴지지 않으면 휴대폰의 진동 설정을 확인하세요.' : '브라우저가 진동을 막았습니다.'; });
+
+/* 길게 눌러 단추 이름 듣기(앱 음성일 때, 손가락): 누른 채 미끄러뜨리면 닿는 단추마다 이름, 떼어도 실행하지 않는다 */
+const lp = { t:null, b:null, on:false }; let suppress = 0;
+const nameOf = b => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim();
+const btnAt = (x, y) => { const el = document.elementFromPoint(x, y), b = el && el.closest ? el.closest('button, a') : null; return b && !hot.contains(b) && b.id !== 'pad' ? b : null; };
+function preview(b){ const r = b.getBoundingClientRect(); tone(500 + (1 - r.top / innerHeight) * 300, .2, .07, 'sine', (r.left / innerWidth) * 2 - 1); buzz(30);
+  if(N && !N.paused){ N.paused = true; tok++; try{ S.cancel(); }catch(e){} paintCtl(); }
+  if(S && voiceOn()){ try{ S.cancel(); const u = new SpeechSynthesisUtterance(nameOf(b)); u.lang = 'ko-KR'; u.rate = RATES[ri][1]; if(voice) u.voice = voice; S.speak(u); }catch(e){} } }
+document.addEventListener('pointerdown', e => { if(e.pointerType === 'mouse' || mode === 'sr') return; const b = btnAt(e.clientX, e.clientY); if(!b) return;
+  lp.b = b; lp.on = false; clearTimeout(lp.t); lp.t = setTimeout(() => { lp.on = true; preview(b); }, 450); }, true);
+document.addEventListener('touchmove', e => { if(!lp.on) return; if(e.cancelable) e.preventDefault(); const t = e.touches[0]; const b = t && btnAt(t.clientX, t.clientY); if(b && b !== lp.b){ lp.b = b; preview(b); } }, { passive:false, capture:true });
+document.addEventListener('pointermove', e => { if(!lp.on) return; const b = btnAt(e.clientX, e.clientY); if(b && b !== lp.b){ lp.b = b; preview(b); } }, true);
+const lpEnd = () => { clearTimeout(lp.t); if(lp.on) suppress = Date.now() + 700; lp.on = false; lp.b = null; };
+document.addEventListener('pointerup', lpEnd, true); document.addEventListener('touchend', lpEnd, true); document.addEventListener('pointercancel', () => { clearTimeout(lp.t); }, true);
+document.addEventListener('click', e => { if(Date.now() < suppress){ e.preventDefault(); e.stopImmediatePropagation(); suppress = 0; } }, true);
+document.addEventListener('contextmenu', e => { if(mode !== 'sr') e.preventDefault(); });
+
+paintCtl(); paintSet();
+addEventListener('pagehide', stopSpeech);
+document.addEventListener('visibilitychange', () => { if(document.hidden) stopAll(); });
+srNum(document.body);
+setTimeout(() => { try{ $('goVoice').focus({ preventScroll:true }); }catch(e){} }, 300);
+}
+</script>
+</body>
+</html>
+
