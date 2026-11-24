@@ -7,12 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&family=Noto+Sans+KR:wght@500;700;900&display=swap">
 <script>
-/* 세로로 든 휴대폰은 화면 전체를 90도 돌려 가로처럼 보여 준다(침묵의 공명과 같은 가로 화면) */
+/* 휴대폰: 세로로 들면 세로 화면(위 메뉴 · 가운데 큰 무대 · 아래 해설), 가로로 들면 얇은 왼쪽 메뉴 · 큰 무대 · 오른쪽 해설.
+   (예전에는 세로 휴대폰을 90도 돌려 보여 줬지만, 무대가 작아져 손끝 탐색이 어려워 세로 화면을 따로 만들었다) */
 (function(){
   var d = document.documentElement;
   function fit(){
-    var w = innerWidth, h = innerHeight, rot = h > w && Math.min(w, h) < 820;
-    d.classList.toggle('rot', rot); d.classList.toggle('short', (rot ? w : h) < 520);
+    var w = innerWidth, h = innerHeight, rot = false;
+    d.classList.toggle('rot', rot); d.classList.toggle('port', h > w && w < 820); d.classList.toggle('short', w >= h && h < 520);
     d.style.setProperty('--W', (rot ? h : w) + 'px'); d.style.setProperty('--H', (rot ? w : h) + 'px'); d.style.setProperty('--H0', w + 'px');
   }
   window.__fit = fit; fit(); addEventListener('resize', fit); addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
@@ -55,7 +56,7 @@ html.hc #start .photo{ background:#000; }
 #start .bar button{ flex:1 0 auto; min-height:44px; padding:0 .7em; border-radius:999px; border:2px solid var(--line); background:transparent; color:#fff; font-size:.7em; font-weight:800; white-space:nowrap; }
 #start .bar button b{ color:var(--acc); }
 @media (orientation:portrait){ html:not(.rot) #start .in{ justify-self:stretch; width:auto; align-self:end; padding:1em; }
-  html:not(.rot) #start .photo{ background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(12,9,5,.9) 45%, rgba(12,9,5,.96) 100%), url('cover.jpg') 30% 0%/auto 45% no-repeat, #000; }
+  html:not(.rot) #start .photo{ background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 48%, rgba(12,9,5,.92) 62%, rgba(12,9,5,.96) 100%), url('cover.jpg') 50% 0%/auto 62% no-repeat, #000; }
   html:not(.rot) #start .bar{ flex-wrap:wrap; } }
 
 /* ── 본 화면: 왼쪽 메뉴, 오른쪽 무대, 무대 아래 단추 줄과 해설 글 ── */
@@ -84,35 +85,8 @@ html.short .lv{ min-height:48px; padding:4px 8px; } html.short .lv small{ displa
 #sub b{ color:var(--acc); margin-right:.4em; }
 #sub:empty{ display:none; }
 html.hc #sub{ background:#000; border-color:var(--acc); }
-/* 모바일 가로 화면: 무대와 이미지 폭을 최대로 확보하고 자막을 하단 고정 패널로 분리 */
-@media (max-width: 900px), (max-height: 600px){
-  html.rot #app{ position:relative; display:block; width:var(--W); height:var(--H); }
-  /* 모바일에서도 왼쪽 장 선택 메뉴를 항상 표시 */
-  html.rot #menu{ position:absolute; z-index:12; left:0; top:0; bottom:0; width:clamp(112px,20%,190px); display:flex; flex-direction:column; overflow-x:hidden; overflow-y:auto; padding:8px 7px calc(8px + env(safe-area-inset-bottom,0px)) max(7px, env(safe-area-inset-left,0px)); border-right:2px solid var(--acc); background:rgba(26,23,18,.98); }
-  html.rot #menu .lv{ min-height:46px; padding:4px 6px; gap:6px; }
-  html.rot #menu .lv b{ width:1.6rem; height:1.6rem; font-size:.85rem; }
-  html.rot #menu .lv span{ font-size:clamp(.78rem,1.8vw,1rem); }
-  html.rot #menu .row{ gap:4px; padding-top:5px; }
-  html.rot #menu .ib{ min-width:38px; height:40px; padding:0 7px; font-size:.78rem; }
-  html.rot #stage{ position:absolute; left:clamp(112px,20%,190px); right:0; top:0; bottom:0; padding:0 0 29%; width:auto; height:100%; }
-  html.rot .view{ inset:0 0 29%; }
-  html.rot .view video{ width:100%; height:100%; object-fit:contain; }
-  html.rot #sub{ display:none; }
-  html.rot #side{ position:absolute; z-index:10; left:clamp(112px,20%,190px); right:0; bottom:0; height:29%; min-height:0; display:flex; border:0; border-top:2px solid var(--acc); padding:0 max(12px, env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) 12px; background:rgba(15,13,10,.97); }
-  html.rot #chips{ display:none; }
-  html.rot #cap{ flex:1; min-height:0; overflow:hidden; padding:6px 12px 8px; }
-  html.rot #capWho{ display:block; font-size:.82rem; line-height:1.2; }
-  html.rot #capText{ max-height:4.8em; overflow-y:auto; overscroll-behavior:contain; scroll-behavior:smooth; margin:2px 0 0; font-size:clamp(1rem,2.8vh,1.3rem); line-height:1.55; }
-  html.rot #capText .ln{ display:block; }
-  html.rot #capText .ln.on{ background:transparent; color:var(--acc); }
-  html.rot #v2{ inset:0 0 29%; }
-  html.rot #frame{ width:min(100%, calc((var(--H) * .71) * 1.15)); height:100%; }
-  html.rot #frame img{ object-fit:contain; }
-  html.rot #whoPic{ top:8px; right:8px; }
-}
-
 /* 2부: 조각 사진과 탐색 지점 */
-#frame{ position:relative; }
+#frame{ position:absolute; left:0; top:0; }
 #frame img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
 #hot{ position:absolute; inset:0; touch-action:none; }
 .hs{ position:absolute; width:64px; height:64px; margin:-32px 0 0 -32px; border:0; padding:0; background:transparent; border-radius:50%; }
@@ -159,29 +133,6 @@ html.rot .dlg{ position:absolute; }
 #ovWrap video{ width:100%; height:100%; object-fit:contain; display:block; }
 #ovSub{ position:absolute; left:50%; bottom:4%; transform:translateX(-50%); width:max-content; max-width:94%; padding:4px 12px; border-radius:8px; background:rgba(0,0,0,.88); color:#fff; font-weight:700; text-align:center; font-size:clamp(.9rem,2.2vw,1.3rem); pointer-events:none; }
 #ovSub:empty{ display:none; }
-/* 소개 영상·화면 해설: 모바일에서는 영상이 중심이 되도록 대화상자를 화면에 맞춤 */
-#ov .box{ display:flex; flex-direction:column; gap:8px; }
-#ov .box > p{ flex:0 0 auto; }
-#ovWrap{ width:100%; min-height:0; }
-#ovWrap video{ max-width:100%; }
-#ov .act{ flex:0 0 auto; }
-@media (max-width:900px), (max-height:600px){
-  #ov.dlg{ padding:0; align-items:stretch; }
-  #ov .box{ width:100%; height:100%; max-height:100%; border-radius:0; border-left:0; border-right:0; padding: max(8px, env(safe-area-inset-top,0px)) max(10px, env(safe-area-inset-right,0px)) max(8px, env(safe-area-inset-bottom,0px)) max(10px, env(safe-area-inset-left,0px)); gap:6px; }
-  #ov .head{ flex:0 0 auto; min-height:44px; }
-  #ov h2{ font-size:1.08rem; }
-  #ov .box > p{ margin:0; font-size:.88rem; line-height:1.4; }
-  #ovWrap{ flex:1 1 auto; width:100%; height:auto; max-height:none; aspect-ratio:auto; margin:2px 0; display:flex; align-items:center; justify-content:center; }
-  #ovWrap video{ width:100%; height:100%; object-fit:contain; }
-  #ovSub{ left:3%; right:3%; bottom:3%; width:auto; max-width:none; transform:none; padding:6px 9px; font-size:clamp(.82rem,2.4vh,1.08rem); line-height:1.35; }
-  #ov .act{ margin-top:0; padding-bottom:env(safe-area-inset-bottom,0px); }
-  #ov .act button{ flex:1 1 0; min-width:0; }
-}
-@media (max-width:520px) and (orientation:portrait){
-  html:not(.rot) #ov .box{ gap:5px; }
-  html:not(.rot) #ov .box > p{ font-size:.82rem; }
-  html:not(.rot) #ovWrap{ min-height:0; }
-}
 
 /* 8장 메뉴 · 거인의 눈 · 점수 */
 .chapters{ display:flex; flex-direction:column; gap:6px; }
@@ -204,6 +155,45 @@ html.short .tools{ flex-wrap:nowrap; gap:4px; } html.short .tools .ib{ flex:1; m
 #whoPic span{ position:absolute; left:0; right:0; bottom:0; padding:2px 4px; background:rgba(0,0,0,.82); color:#fff; font-weight:800; font-size:.8rem; text-align:center; }
 .portrait{ height:min(34%, 13rem); aspect-ratio:3/4; object-fit:cover; object-position:50% 15%; border-radius:14px; border:2px solid var(--line); flex-shrink:0; }
 html.short .portrait{ height:38%; }
+
+/* ── 휴대폰 화면: 무대를 가장 크게 ── */
+#chapBtn{ display:none; }
+#chapBtn b{ display:inline-flex; align-items:center; justify-content:center; width:1.6rem; height:1.6rem; border-radius:50%; background:var(--acc); color:var(--accInk); font-size:.85rem; flex:0 0 auto; }
+html.port #chapBtn, html.short #chapBtn{ display:flex; align-items:center; gap:6px; }
+html.port #menu .chapters, html.short #menu .chapters, html.port #menu h2, html.port #menu [data-open="about"], html.short #menu [data-open="about"]{ display:none; }
+/* 세로: 위 한 줄 메뉴 / 가운데 무대 / 아래 이어 가기 단추와 해설 */
+html.port #app{ grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr) auto; grid-template-areas:"menu" "stage" "side"; }
+html.port #menu{ flex-direction:row; align-items:center; gap:5px; padding:calc(5px + env(safe-area-inset-top,0px)) 6px 5px; border-right:0; border-bottom:2px solid var(--line); overflow:visible; }
+html.port #menu .row{ flex-wrap:nowrap; gap:5px; padding:0; border:0; }
+html.port #menu .ib{ height:46px; min-width:46px; padding:0 9px; font-size:.82rem; }
+html.port #chapBtn{ flex:1 1 auto !important; min-width:0; justify-content:flex-start; border-color:var(--acc); }
+html.port #chapBtn span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.85rem; }
+html.port #side{ border-left:0; border-top:2px solid var(--line); height:clamp(9.5rem, 31vh, 16rem); padding-right:0; }
+html.port #chips{ flex-wrap:nowrap; overflow-x:auto; gap:6px; padding:6px 8px; }
+html.port #chips button{ min-height:46px; font-size:.92rem; }
+html.port #cap{ padding:6px 12px calc(8px + env(safe-area-inset-bottom,0px)); }
+html.port #capText{ font-size:1rem; line-height:1.55; }
+html.port #sub{ font-size:1rem; bottom:2%; }
+html.port #whoPic{ width:min(26%, 7rem); right:6px; top:6px; }
+html.port #card{ max-width:min(62%, 16rem); font-size:.92rem; }
+html.port #v3{ padding:10px; gap:10px; }
+html.port .pad{ min-height:min(46vh, 360px); }
+html.port .pick{ grid-template-columns:1fr; }
+html.port .pick button{ min-height:88px; }
+/* 가로 휴대폰: 왼쪽 메뉴를 얇은 세로 줄로, 오른쪽 해설은 좁게 */
+html.short #app{ grid-template-columns:auto minmax(0,1fr) min(34%, 14rem); }
+html.short #menu{ width:auto; padding:calc(6px + env(safe-area-inset-top,0px)) 5px 6px calc(5px + env(safe-area-inset-left,0px)); gap:5px; align-items:stretch; }
+html.short #menu .row, html.short #menu .tools{ flex-direction:column; flex-wrap:nowrap; gap:5px; padding-top:5px; }
+html.short #menu .ib, html.short .tools .ib{ flex:0 0 auto; height:44px; min-width:52px; width:100%; padding:0 6px; font-size:.75rem; }
+html.short #chapBtn{ flex-direction:column; justify-content:center; gap:0; height:auto !important; min-height:52px; padding:4px !important; border-color:var(--acc); border-radius:14px; }
+html.short #chapBtn span{ display:none; }
+html.short #chips{ gap:5px; padding:5px 6px; }
+html.short #chips button{ min-height:44px; padding:2px 10px; font-size:.85rem; white-space:normal; text-align:left; }
+html.short #cap{ padding:5px 10px calc(6px + env(safe-area-inset-bottom,0px)); }
+html.short #capText{ font-size:.95rem; line-height:1.5; }
+html.short #capWho{ font-size:.8rem; }
+html.short .pad{ min-height:min(62vh, 260px); }
+html.short #v3{ padding:8px; gap:8px; }
 </style>
 </head>
 <body>
@@ -236,6 +226,7 @@ html.short .portrait{ height:38%; }
 <main id="app" inert>
   <nav id="menu" aria-label="메뉴">
     <h2 id="appTitle" tabindex="-1">반가워, 사유</h2>
+    <button type="button" class="ib" id="chapBtn" data-open="chap" aria-label="장 고르기"><b id="chapNum" aria-hidden="true">·</b><span id="chapName">장 고르기</span></button>
     <div class="chapters" role="group" aria-label="장 고르기"></div>
     <div class="row" role="group" aria-label="해설 조절">
       <button type="button" class="ib" id="pauseBtn" aria-label="해설 일시정지"><span aria-hidden="true" id="pauseIcon">❚❚</span></button>
@@ -543,7 +534,7 @@ function setChips(list){ const box = $('chips'); box.innerHTML = '';
 const chips = $('chips');
 function addChip(label, fn, go){ const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if(go) b.className = 'go'; b.addEventListener('click', fn); chips.appendChild(b); }
 const nextLabel = n => '다음: ' + CH[n].n + ' ▶';
-function go(n){ stopAll(); chN = n; document.querySelectorAll('.lv').forEach(b => +b.dataset.ch === n ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current'));
+function go(n){ stopAll(); chN = n; $('chapNum').textContent = n; $('chapName').textContent = CH[n].n; $('chapBtn').setAttribute('aria-label', '지금 ' + HAN[n] + '장 ' + CH[n].n + '. 장 고르기'); document.querySelectorAll('.lv').forEach(b => +b.dataset.ch === n ? b.setAttribute('aria-current', 'true') : b.removeAttribute('aria-current'));
   ({ 1:ch1, 2:ch2, 3:ch3, 4:ch4, 5:ch5, 6:ch6, 7:ch7, 8:ch8 })[n](); }
 /* 한 장이 끝나면: 소리로 하는 사람은 저절로 다음 장, 화면 읽기는 다음 단추로 */
 function chapterEnd(n, extra){ const my = flow; setChips([[nextLabel(n + 1), () => go(n + 1), 1]]);
@@ -565,7 +556,15 @@ V1.addEventListener('ended', () => { if(chN !== 1) return; sub.textContent = '';
 /* ── 사진 위 손끝 탐색(2 · 3 · 4 · 5장이 함께 쓴다) ── */
 let EX = null, cur = -1, inSpot = -1, lastPtr = 0, exploring = false;
 const frame = $('frame'), hot = $('hot');
-function fitFrame(){ const box = $('stage'), aw = box.clientWidth, ah = box.clientHeight; if(!aw || !ah) return; const r = 658 / 741, w = Math.min(aw, ah * r); frame.style.width = w + 'px'; frame.style.height = (w / r) + 'px'; }
+/* 사진 전체(658×741)가 아니라 상이 있는 부분(가로 18~72%, 세로 3~93%: 탐색 지점이 모두 들어가는 영역)을 무대에 꽉 차게 키운다.
+   남는 자리에는 사진의 나머지가 그대로 보이고, 무대 밖으로 나간 부분은 잘린다. 탐색 지점 좌표(%)는 사진 전체 기준 그대로. */
+const CROP = { x0:.18, x1:.72, y0:.03, y1:.93 };
+function fitFrame(){ const box = $('stage'), aw = box.clientWidth, ah = box.clientHeight; if(!aw || !ah) return;
+  const IW = 658, IH = 741, cw = (CROP.x1 - CROP.x0) * IW, ch = (CROP.y1 - CROP.y0) * IH, k = Math.min(aw / cw, ah / ch), W = IW * k, H = IH * k;
+  const cx = (CROP.x0 + CROP.x1) / 2 * W, cy = (CROP.y0 + CROP.y1) / 2 * H;
+  const place = (box, size, c) => size <= box ? (box - size) / 2 : Math.min(0, Math.max(box - size, box / 2 - c));
+  const L = place(aw, W, cx), T = place(ah, H, cy);
+  frame.style.width = W + 'px'; frame.style.height = H + 'px'; frame.style.left = L + 'px'; frame.style.top = T + 'px'; }
 addEventListener('resize', fitFrame); if(window.ResizeObserver) new ResizeObserver(fitFrame).observe($('stage'));
 /* cfg: { spots:[{x,y,n,label?,done?}], arrive(k), tap(k) } */
 function setEx(cfg){ EX = cfg; cur = -1; inSpot = -1; renderHot(); }
