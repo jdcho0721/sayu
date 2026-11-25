@@ -194,6 +194,39 @@ html.short #capText{ font-size:.95rem; line-height:1.5; }
 html.short #capWho{ font-size:.8rem; }
 html.short .pad{ min-height:min(62vh, 260px); }
 html.short #v3{ padding:8px; gap:8px; }
+
+/* ── 표지 고침(요청: 표지 사진이 안 보인다) — 제목은 위, 시작하기 단추들은 맨 아래로 내리고 8개 바로가기는 작게 정리.
+   가운데를 덮던 어두운 막을 걷고 사진 전체(닿을 듯 멈춘 두 손끝)가 보이게 한다 ── */
+#start .in{ justify-self:stretch !important; align-self:stretch !important; width:auto !important; display:flex; flex-direction:column; text-align:center;
+  padding:calc(.5em + env(safe-area-inset-top,0px)) max(.8em, env(safe-area-inset-right,0px)) .45em max(.8em, env(safe-area-inset-left,0px)) !important; }
+#start h1{ text-shadow:0 2px 14px rgba(0,0,0,.95), 0 0 4px rgba(0,0,0,.9); }
+#start .sub{ margin:.2em 0 0 !important; color:#ece6da; text-shadow:0 1px 8px rgba(0,0,0,.95); }
+#start .btns{ margin-top:auto; width:100%; max-width:46em; align-self:center; }
+#start .sbtn{ align-items:center; text-align:center; background:rgba(12,9,5,.8); }
+#start .sbtn.main{ background:var(--acc); }
+#start .bar button{ background:rgba(12,9,5,.7); }
+/* 가로 화면: 사진을 화면 가득, 위아래 끝만 살짝 어둡게. 단추 셋은 한 줄, 바로가기 8개도 한 줄 */
+@media (orientation:landscape){
+  #start{ font-size:clamp(13px, min(calc(var(--H, 100vh) / 22), calc(var(--W, 100vw) / 44)), 20px) !important; }
+  html body #start .photo{ background:linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 64%, rgba(12,9,5,.8) 100%), url('cover.jpg') 50% 50%/cover no-repeat, #000 !important; }
+  #start h1{ font-size:1.7em; }
+  #start .btns{ grid-template-columns:1.4fr 1fr 1fr !important; gap:.4em; max-width:40em; }
+  #start .sbtn{ min-height:46px; padding:.2em .5em; font-size:.85em; }
+  #start .sbtn.main{ grid-column:auto !important; font-size:1.05em; }
+  #start .bar{ flex-wrap:nowrap !important; justify-content:center; gap:.3em; padding:.3em .5em calc(.3em + env(safe-area-inset-bottom,0px)); background:rgba(12,9,5,.85); }
+  #start .bar button{ flex:0 1 auto; min-height:40px; padding:0 .65em; font-size:.75em; }
+}
+/* 세로 화면: 사진 전체를 가운데에(양쪽 손끝이 잘리지 않게), 제목은 위, 단추는 아래. 바로가기 8개는 4개씩 두 줄 */
+@media (orientation:portrait){
+  html:not(.rot) body #start .photo{ background:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 62%, rgba(12,9,5,.85) 82%, rgba(12,9,5,.95) 100%), url('cover.jpg') 50% 40%/100% auto no-repeat, #000 !important; }
+  html:not(.rot) body #start .in{ align-self:stretch !important; padding:calc(1em + env(safe-area-inset-top,0px)) 1em .6em !important; }
+  #start h1{ font-size:2.1em; }
+  #start .btns{ gap:.4em; }
+  #start .sbtn{ min-height:46px; padding:.2em .5em; }
+  #start .sbtn.main{ font-size:1.2em; }
+  html:not(.rot) body #start .bar{ display:grid !important; grid-template-columns:repeat(4, minmax(0,1fr)); gap:.3em; padding:.35em .5em calc(.4em + env(safe-area-inset-bottom,0px)); overflow:visible; }
+  html:not(.rot) body #start .bar button{ min-height:44px; padding:.15em .2em; border-radius:12px; font-size:.78em; line-height:1.2; white-space:normal; word-break:keep-all; }
+}
 </style>
 </head>
 <body>
